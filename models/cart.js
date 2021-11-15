@@ -7,6 +7,16 @@ const p = path.join(
   'cart.json'
 )
 
+// Cart: {
+//   products: [
+//     {
+//       id,
+//       qty
+//     }
+//   ],
+//   totalPrice
+// }
+
 module.exports = class Cart {
   static addProduct(id, productPrice) {
     // Fetch the previous cart
@@ -35,6 +45,28 @@ module.exports = class Cart {
       fs.writeFile(p, JSON.stringify(cart), (err) => {
         console.log(err)
       })
+    })
+  }
+
+  static deleteProduct(id, price) {
+    fs.readFile(p, (err, fileContent) => {
+      if (err) {
+        // cart is empty
+        return
+      } else {
+        const updatedCart = { ...JSON.parse(fileContent) }
+        const existingProductIndex = updatedCart.products.findIndex(
+          (prod) => prod.id === id
+        )
+        // decreasing total price of cart
+        const prdQty = updatedCart.products[existingProductIndex].qty
+        updatedCart.totalPrice = updatedCart.totalPrice - prdQty * price
+        // removing product from cart
+        updatedCart.products = updatedCart.products.filter(
+          (prod) => prod.id !== id
+        )
+        fs.writeFile(p, JSON.stringify(updatedCart), (err) => {})
+      }
     })
   }
 }
