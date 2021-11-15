@@ -203,7 +203,7 @@ form {
   }
 
   #side-menu-toggle {
-    /* display: none; */
+    display: none;
   }
 
   .mobile-nav {
