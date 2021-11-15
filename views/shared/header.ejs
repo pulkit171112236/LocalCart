@@ -1,0 +1,25 @@
+<header class="main-header">
+  <nav class="main-header__nav">
+    <ul class="main-header__item_list">
+      <a
+        class="main-header__item <%= path==='/shop/products' ? 'active' : ''%>"
+        href="/shop/products"
+        >My-shop</a
+      >
+      <a
+        class="
+          main-header__item
+          <%=
+          path==='/admin/add-product'
+          ?
+          'active'
+          :
+          ''
+          %>
+        "
+        href="/admin/add-product"
+        >add-product</a
+      >
+    </ul>
+  </nav>
+</header>
