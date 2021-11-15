@@ -66,6 +66,17 @@ exports.postDeleteProduct = (req, res, next) => {
   })
 }
 
+exports.postDeleteFromCart = (req, res, next) => {
+  const productId = req.body.productId
+  console.log('body:', req.body)
+  Product.findById(productId, (product) => {
+    console.log(product)
+    const price = product.price
+    Cart.deleteProduct(productId, price)
+    res.redirect('/cart')
+  })
+}
+
 exports.getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
     res.render('admin/products', {

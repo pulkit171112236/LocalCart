@@ -23,4 +23,5 @@ router.post('/edit-product', adminController.postEditProduct)
 
 router.post('/delete-product', adminController.postDeleteProduct)
 
+router.post('/delete-from-cart', adminController.postDeleteFromCart)
 module.exports = router
