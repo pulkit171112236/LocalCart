@@ -1,1 +1,16 @@
-[{"title":"Acer","imageUrl":"https://m.media-amazon.com/images/I/71sesDsw95L._AC_SS450_.jpg","description":"laptop\r\n","price":"16345","id":"0.3599660221221199"},{"title":"Redmi note 11","imageUrl":"https://fdn.gsmarena.com/imgroot/news/21/10/xiaomi-redmi-note-11-series-ofic/inline/-1200/gsmarena_008.jpg","description":"","price":"","id":"0.7975480706363396"}]
+[
+  {
+    "title": "Acer",
+    "imageUrl": "https://m.media-amazon.com/images/I/71sesDsw95L._AC_SS450_.jpg",
+    "description": "laptop\r\n",
+    "price": "16345",
+    "id": "0.3599660221221199"
+  },
+  {
+    "title": "Redmi note 11",
+    "imageUrl": "https://fdn.gsmarena.com/imgroot/news/21/10/xiaomi-redmi-note-11-series-ofic/inline/-1200/gsmarena_008.jpg",
+    "description": "",
+    "price": "",
+    "id": "0.7975480706363396"
+  }
+]

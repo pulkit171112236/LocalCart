@@ -69,4 +69,15 @@ module.exports = class Cart {
       }
     })
   }
+
+  static getCart(cb) {
+    fs.readFile(p, (err, fileContent) => {
+      if (!err) {
+        cb(JSON.parse(fileContent))
+      } else {
+        console.log('err-when-reading-from-cart:', err)
+        cb({ products: [], totalPrice: 0 })
+      }
+    })
+  }
 }
