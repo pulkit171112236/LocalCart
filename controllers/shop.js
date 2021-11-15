@@ -33,9 +33,31 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getCart = (req, res, next) => {
-  res.render('shop/cart', {
-    path: '/cart',
-    pageTitle: 'Your Cart',
+  Cart.getCart((cart) => {
+    const detailedProducts = [...cart.products]
+    const totalPrice = cart.totalPrice
+    const addProductProps = (i, cb) => {
+      console.log('adding props for i:', i)
+      if (i < detailedProducts.length) {
+        Product.findById(detailedProducts[i].id, (product) => {
+          if (product) {
+            detailedProducts[i] = { ...detailedProducts[i], ...product }
+          }
+          addProductProps(i + 1, cb)
+        })
+      } else {
+        console.log('callback function')
+        cb()
+      }
+    }
+    addProductProps(0, () => {
+      res.render('shop/cart', {
+        path: '/cart',
+        pageTitle: 'Your Cart',
+        products: detailedProducts,
+        totalPrice: totalPrice,
+      })
+    })
   })
 }
 
