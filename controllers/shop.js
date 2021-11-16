@@ -1,6 +1,16 @@
 const Product = require('../models/product')
 const Cart = require('../models/cart')
 
+exports.getIndex = (req, res, next) => {
+  Product.fetchAll().then(([rows]) => {
+    res.render('shop/index', {
+      prods: rows,
+      pageTitle: 'Shop',
+      path: '/',
+    })
+  })
+}
+
 exports.getProducts = (req, res, next) => {
   Product.fetchAll().then(([rows]) => {
     res.render('shop/product-list', {
@@ -13,22 +23,14 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId
-  Product.findById(prodId, (product) => {
-    res.render('shop/product-detail', {
-      product: product,
-      pageTitle: 'Details',
-      path: '/products',
-    })
-  })
-}
-
-exports.getIndex = (req, res, next) => {
-  Product.fetchAll().then(([rows]) => {
-    res.render('shop/index', {
-      prods: rows,
-      pageTitle: 'Shop',
-      path: '/',
-    })
+  Product.findById(prodId).then(([rows]) => {
+    if (rows.length === 1) {
+      res.render('shop/product-detail', {
+        product: rows[0],
+        pageTitle: 'Details',
+        path: '/products',
+      })
+    }
   })
 }
 
@@ -58,41 +60,15 @@ exports.getCart = (req, res, next) => {
   })
 }
 
-exports.getCart2 = (req, res, next) => {
-  Cart.getCart((cart) => {
-    const detailedProducts = [...cart.products]
-    const totalPrice = cart.totalPrice
-    const addProductProps = (i, cb) => {
-      console.log('adding props for i:', i)
-      if (i < detailedProducts.length) {
-        Product.findById(detailedProducts[i].id, (product) => {
-          if (product) {
-            detailedProducts[i] = { ...detailedProducts[i], ...product }
-          }
-          addProductProps(i + 1, cb)
-        })
-      } else {
-        console.log('callback function')
-        cb()
-      }
-    }
-    addProductProps(0, () => {
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: detailedProducts,
-        totalPrice: totalPrice,
-      })
-    })
-  })
-}
-
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId
-  Product.findById(prodId, (product) => {
-    Cart.addProduct(prodId, product.price)
+  Product.findById(prodId).then(([rows]) => {
+    if (rows.length === 1) {
+      const product = rows[0]
+      Cart.addProduct(prodId, product.price)
+    }
+    res.redirect('/cart')
   })
-  res.redirect('/cart')
 }
 
 exports.getOrders = (req, res, next) => {

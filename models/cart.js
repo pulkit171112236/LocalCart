@@ -1,12 +1,3 @@
-const fs = require('fs')
-const path = require('path')
-
-const p = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'cart.json'
-)
-
 // Cart: {
 //   products: [
 //     {
@@ -16,6 +7,15 @@ const p = path.join(
 //   ],
 //   totalPrice
 // }
+
+const fs = require('fs')
+const path = require('path')
+
+const p = path.join(
+  path.dirname(process.mainModule.filename),
+  'data',
+  'cart.json'
+)
 
 module.exports = class Cart {
   static addProduct(id, productPrice) {
@@ -55,17 +55,19 @@ module.exports = class Cart {
         return
       } else {
         const updatedCart = { ...JSON.parse(fileContent) }
-        const existingProductIndex = updatedCart.products.findIndex(
-          (prod) => prod.id === id
+        const existingProduct = updatedCart.products.find(
+          (cprod) => cprod.id === id
         )
-        // decreasing total price of cart
-        const prdQty = updatedCart.products[existingProductIndex].qty
-        updatedCart.totalPrice = updatedCart.totalPrice - prdQty * price
-        // removing product from cart
-        updatedCart.products = updatedCart.products.filter(
-          (prod) => prod.id !== id
-        )
-        fs.writeFile(p, JSON.stringify(updatedCart), (err) => {})
+        if (existingProduct) {
+          // decreasing price
+          const prdQty = existingProduct.qty
+          updatedCart.totalPrice = updatedCart.totalPrice - prdQty * price
+          // removing product from cart
+          updatedCart.products = updatedCart.products.filter(
+            (prod) => prod.id !== id
+          )
+          fs.writeFile(p, JSON.stringify(updatedCart), (err) => {})
+        }
       }
     })
   }
