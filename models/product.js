@@ -1,6 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 
+const db = require('../util/database')
+
 const p = path.join(
   path.dirname(process.mainModule.filename),
   'data',
@@ -63,7 +65,7 @@ module.exports = class Product {
   }
 
   static fetchAll(cb) {
-    getProductsFromFile(cb)
+    return db.execute('SELECT * FROM products')
   }
 
   static findById(id, cb) {
