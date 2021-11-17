@@ -3,6 +3,7 @@ const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 
+const sequelize = require('./util/database')
 const errorController = require('./controllers/error')
 
 const app = express()
@@ -21,4 +22,11 @@ app.use(shopRoutes)
 
 app.use(errorController.get404)
 
-app.listen(3000)
+sequelize
+  .sync()
+  .then((result) => {
+    app.listen(3000)
+  })
+  .catch((err) => {
+    console.log('__error_in_syncing_database__', err)
+  })

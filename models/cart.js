@@ -8,7 +8,21 @@
 //   totalPrice
 // }
 
-const db = require('../util/database')
+const db = require('../util/database_mysql')
+
+db.execute(
+  `CREATE TABLE IF NOT EXISTS cart (
+    product_id INTEGER NOT NULL,
+    qty INTEGER NOT NULL,
+    PRIMARY KEY (product_id),
+    FOREIGN KEY (product_id) REFERENCES products (id)
+      ON DELETE CASCADE
+      ON UPDATE NO ACTION
+  )
+  ENGINE=InnoDB`
+).catch((err) => {
+  console.log('err', err)
+})
 module.exports = class Cart {
   static async addProduct(id) {
     return db
@@ -34,7 +48,7 @@ module.exports = class Cart {
     return db.execute('DELETE FROM cart WHERE product_id = ?', [id])
   }
 
-  static getCart(cb) {
+  static getCart() {
     return db.execute(
       'SELECT products.*, cart.qty FROM products JOIN cart ON products.id = cart.product_id'
     )

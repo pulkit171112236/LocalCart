@@ -1,5 +1,6 @@
 const Product = require('../models/product')
 const Cart = require('../models/cart')
+const { destroy } = require('../models/product')
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -13,13 +14,20 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl
   const price = req.body.price
   const description = req.body.description
-  const product = new Product(title, imageUrl, description, price)
-  if (!title || !imageUrl || !price || !description) {
-    return res.redirect('/admin/add-product')
-  }
-  product.save().then(() => {
-    res.redirect('/')
+  Product.create({
+    title: title,
+    imageUrl: imageUrl,
+    price: price,
+    description: description,
   })
+    .then(() => {
+      console.log('__added__')
+      res.redirect('/admin/products')
+    })
+    .catch((err) => {
+      console.log('__error_creating_product__', err)
+      res.redirect('/admin/add-product')
+    })
 }
 
 exports.getEditProduct = (req, res, next) => {
@@ -28,18 +36,13 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/')
   }
   const prodId = req.params.productId
-  Product.findById(prodId).then(([rows]) => {
-    if (rows.length === 1) {
-      const product = rows[0]
-      res.render('admin/edit-product', {
-        pageTitle: 'Edit Product',
-        path: '/admin/edit-product',
-        editing: editMode,
-        product: product,
-      })
-    } else {
-      res.render('/admin/products')
-    }
+  Product.findByPk(prodId).then((product) => {
+    res.render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      path: '/admin/edit-product',
+      editing: editMode,
+      product: product,
+    })
   })
 }
 
@@ -50,34 +53,33 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price
   const updatedImgUrl = req.body.imageUrl
   const updatedDesc = req.body.description
-  if (!updatedTitle || !updatedPrice || !updatedImgUrl || !updatedDesc) {
-    return res.redirect('/admin/edit-product/' + prodId + '?edit=true')
-  }
-  const updatedProduct = new Product(
-    updatedTitle,
-    updatedImgUrl,
-    updatedDesc,
-    updatedPrice,
-    prodId
-  )
-  updatedProduct.save().then(() => {
-    res.redirect('/admin/products')
+  Product.upsert({
+    id: prodId,
+    title: updatedTitle,
+    price: updatedPrice,
+    imageUrl: updatedImgUrl,
+    description: updatedDesc,
   })
+    .then(() => {
+      res.redirect('/admin/products')
+    })
+    .catch((err) => {
+      console.log('__error_while_updating__', err)
+      return res.redirect('/admin/edit-product/' + prodId + '?edit=true')
+    })
 }
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId
-  Cart.deleteProduct(productId).then(() => {
-    Product.deleteById(productId).then(() => {
-      res.redirect('/admin/products')
-    })
+  Product.destroy({ where: { id: productId } }).then((rowsDeleted) => {
+    res.redirect('/admin/products')
   })
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then(([rows]) => {
+  Product.findAll().then((products) => {
     res.render('admin/products', {
-      prods: rows,
+      prods: products,
       pageTitle: 'Admin Products',
       path: '/admin/products',
     })
