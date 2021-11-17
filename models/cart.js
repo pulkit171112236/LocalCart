@@ -8,78 +8,35 @@
 //   totalPrice
 // }
 
-const fs = require('fs')
-const path = require('path')
-
-const p = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'cart.json'
-)
-
+const db = require('../util/database')
 module.exports = class Cart {
-  static addProduct(id, productPrice) {
-    // Fetch the previous cart
-    fs.readFile(p, (err, fileContent) => {
-      let cart = { products: [], totalPrice: 0 }
-      if (!err) {
-        cart = JSON.parse(fileContent)
-      }
-      // Analyze the cart => Find existing product
-      const existingProductIndex = cart.products.findIndex(
-        (prod) => prod.id === id
-      )
-      const existingProduct = cart.products[existingProductIndex]
-      let updatedProduct
-      // Add new product/ increase quantity
-      if (existingProduct) {
-        updatedProduct = { ...existingProduct }
-        updatedProduct.qty = updatedProduct.qty + 1
-        cart.products = [...cart.products]
-        cart.products[existingProductIndex] = updatedProduct
-      } else {
-        updatedProduct = { id: id, qty: 1 }
-        cart.products = [...cart.products, updatedProduct]
-      }
-      cart.totalPrice = cart.totalPrice + +productPrice
-      fs.writeFile(p, JSON.stringify(cart), (err) => {
-        console.log(err)
+  static async addProduct(id) {
+    return db
+      .execute('SELECT * FROM cart WHERE product_id = ?', [id])
+      .then(([rows]) => {
+        if (rows.length === 0) {
+          // add the element to cart with qty as 1
+          return db.execute(
+            'INSERT INTO cart (product_id, qty) VALUES (?, ?)',
+            [id, 1]
+          )
+        } else {
+          // update the existing element
+          return db.execute(
+            'UPDATE cart SET qty = qty+1 WHERE product_id = ?',
+            [id]
+          )
+        }
       })
-    })
   }
 
-  static deleteProduct(id, price) {
-    fs.readFile(p, (err, fileContent) => {
-      if (err) {
-        // cart is empty
-        return
-      } else {
-        const updatedCart = { ...JSON.parse(fileContent) }
-        const existingProduct = updatedCart.products.find(
-          (cprod) => cprod.id === id
-        )
-        if (existingProduct) {
-          // decreasing price
-          const prdQty = existingProduct.qty
-          updatedCart.totalPrice = updatedCart.totalPrice - prdQty * price
-          // removing product from cart
-          updatedCart.products = updatedCart.products.filter(
-            (prod) => prod.id !== id
-          )
-          fs.writeFile(p, JSON.stringify(updatedCart), (err) => {})
-        }
-      }
-    })
+  static deleteProduct(id) {
+    return db.execute('DELETE FROM cart WHERE product_id = ?', [id])
   }
 
   static getCart(cb) {
-    fs.readFile(p, (err, fileContent) => {
-      if (!err) {
-        cb(JSON.parse(fileContent))
-      } else {
-        console.log('err-when-reading-from-cart:', err)
-        cb({ products: [], totalPrice: 0 })
-      }
-    })
+    return db.execute(
+      'SELECT products.*, cart.qty FROM products JOIN cart ON products.id = cart.product_id'
+    )
   }
 }

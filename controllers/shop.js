@@ -35,38 +35,27 @@ exports.getProduct = (req, res, next) => {
 }
 
 exports.getCart = (req, res, next) => {
-  Cart.getCart((cart) => {
-    Product.fetchAll((products) => {
-      const cartDetailedProducts = []
-      for (let product of products) {
-        const corrCartProduct = cart.products.find(
-          (cprod) => cprod.id === product.id
-        )
-        // if current product is present is cart
-        if (corrCartProduct) {
-          cartDetailedProducts.push({
-            productData: product,
-            productQty: corrCartProduct.qty,
-          })
-        }
-      }
-      res.render('shop/cart', {
-        pageTitle: 'Cart',
-        path: '/cart',
-        products: cartDetailedProducts,
-        totalPrice: cart.totalPrice,
-      })
+  Cart.getCart().then(([rows]) => {
+    res.render('shop/cart', {
+      pageTitle: 'Cart',
+      path: '/cart',
+      products: rows,
+      totalPrice: 0,
     })
   })
 }
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId
-  Product.findById(prodId).then(([rows]) => {
-    if (rows.length === 1) {
-      const product = rows[0]
-      Cart.addProduct(prodId, product.price)
-    }
+  Cart.addProduct(prodId).then((result) => {
+    console.log('result', result)
+    res.redirect('/cart')
+  })
+}
+
+exports.postDeleteFromCart = (req, res, next) => {
+  const productId = req.body.productId
+  Cart.deleteProduct(productId).then(() => {
     res.redirect('/cart')
   })
 }
