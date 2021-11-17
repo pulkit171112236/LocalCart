@@ -9,33 +9,33 @@
                 <div class="total_price__bar">
                     <p>TotalPrice: <%= totalPrice %></p>
                 </div>
-                <% if (products.length > 0) { %>
+                <% if (cart.length > 0) { %>
                     <div class="grid">
-                        <% for (let product of products) { %>
+                        <% for (let element of cart) { %>
                             <article class="card product-item">
                                 <header class="card__header">
                                     <h1 class="product__title">
-                                        <%= product.title %>
+                                        <%= element.product.title %>
                                     </h1>
                                 </header>
                                 <div class="card__image">
-                                    <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
+                                    <img src="<%= element.product.imageUrl %>" alt="<%= element.product.title %>">
                                 </div>
                                 <div class="card__content">
                                     <h2 class="product__price">
-                                        ₹<%= product.price %>
+                                        ₹<%= element.product.price %>
                                     </h2>
                                     <p class="product__description">
-                                        <%= product.description %>
+                                        <%= element.product.description %>
                                     </p>
                                     <h2 class="product__price">
-                                        Qty: <%= product.qty %>
+                                        Qty: <%= element.qty %>
                                     </h2>
                                     
                                 </div>
                                 <div class="card__actions">
                                     <form action="/delete-from-cart" method="POST">
-                                        <input type="hidden" name="productId" value="<%= product.id %>">
+                                        <input type="hidden" name="productId" value="<%= element.product_id %>">
                                         <button class="btn" type="submit">Delete</button>
                                     </form>
                                 </div>
