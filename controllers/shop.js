@@ -71,7 +71,7 @@ exports.postCart = (req, res, next) => {
         })
       } else {
         return Product.findByPk(prodId).then((product) => {
-          fetchedCart.addProduct(product, { through: { quantity: 1 } })
+          return fetchedCart.addProduct(product, { through: { quantity: 1 } })
         })
       }
     })
@@ -82,14 +82,21 @@ exports.postCart = (req, res, next) => {
 
 exports.postDeleteFromCart = (req, res, next) => {
   const productId = req.body.productId
-  Cart.destroy({
-    where: { product_id: productId },
-  })
+  const user = req.user
+  user
+    .getCart()
+    .then((cart) => {
+      return cart.getProducts({ where: { id: productId } })
+    })
+    .then((cartProducts) => {
+      const cartProduct = cartProducts[0]
+      return cartProduct.cartItem.destroy()
+    })
     .then(() => {
-      res.redirect('/cart')
+      return res.redirect('/cart')
     })
     .catch((err) => {
-      console.log('__error_while_deleting_from_cart__', err)
+      console.log('__error_deleting_from_cart__', err)
     })
 }
 
