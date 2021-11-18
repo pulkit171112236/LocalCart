@@ -1,6 +1,8 @@
 const Product = require('../models/product')
 const Cart = require('../models/cart')
 const CartItem = require('../models/cart-item')
+const Order = require('../models/order')
+const OrderItem = require('../models/order-item')
 
 exports.getIndex = (req, res, next) => {
   const user = req.user
@@ -101,10 +103,58 @@ exports.postDeleteFromCart = (req, res, next) => {
 }
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders',
-  })
+  req.user
+    .getOrders({ include: ['products'] })
+    // .then((orders) => {
+    //   console.log('orders: ', orders)
+    //   if (orders.length > 0) {
+    //     return orders[0].getProducts()
+    //   } else return []
+    // })
+    .then((orders) => {
+      console.log(orders[0])
+      res.render('shop/orders', {
+        path: '/orders',
+        pageTitle: 'Your Orders',
+        orders: orders,
+        totalPrice: 0,
+      })
+    })
+    .catch((err) => {
+      console.log('__error_getting_order__', err)
+    })
+}
+
+exports.postOrder = (req, res, next) => {
+  let fetchedProducts
+  let fetchedCart
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart
+      return cart.getProducts()
+    })
+    .then((products) => {
+      fetchedProducts = products
+      return req.user.createOrder()
+    })
+    .then((order) => {
+      return order.addProducts(
+        fetchedProducts.map((product) => {
+          product.orderItem = { quantity: product.cartItem.quantity }
+          return product
+        })
+      )
+    })
+    .then(() => {
+      return fetchedCart.setProducts(null)
+    })
+    .then(() => {
+      res.redirect('/orders')
+    })
+    .catch((err) => {
+      console.log('__error_creating_order__', err)
+    })
 }
 
 exports.getCheckout = (req, res, next) => {
