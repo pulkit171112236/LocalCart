@@ -1,6 +1,4 @@
 const Product = require('../models/product')
-const Cart = require('../models/cart')
-const { destroy } = require('../models/product')
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -9,17 +7,21 @@ exports.getAddProduct = (req, res, next) => {
   })
 }
 
+// **to be fixed later
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title
   const imageUrl = req.body.imageUrl
   const price = req.body.price
   const description = req.body.description
-  Product.create({
-    title: title,
-    imageUrl: imageUrl,
-    price: price,
-    description: description,
-  })
+  const user = req.user
+  user
+    .createProduct({
+      title: title,
+      imageUrl: imageUrl,
+      price: price,
+      description: description,
+      userId: user.id,
+    })
     .then(() => {
       console.log('__added__')
       res.redirect('/admin/products')
