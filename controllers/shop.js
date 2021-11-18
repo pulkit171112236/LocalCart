@@ -105,12 +105,6 @@ exports.postDeleteFromCart = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   req.user
     .getOrders({ include: ['products'] })
-    // .then((orders) => {
-    //   console.log('orders: ', orders)
-    //   if (orders.length > 0) {
-    //     return orders[0].getProducts()
-    //   } else return []
-    // })
     .then((orders) => {
       console.log(orders[0])
       res.render('shop/orders', {
