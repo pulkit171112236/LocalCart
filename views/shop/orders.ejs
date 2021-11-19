@@ -7,8 +7,12 @@
             <main>
                 <% if (orders.length > 0) { %>
                     <% orders.forEach(order => { %>
-                        <div class="total_price__bar centered">
-                            <p>OrderId: <%= order.id %></p>
+                        <div class="centered">
+                            <p>OrderId: #<%= order.id %></p>
+                            <form action="/cancel-order" method="POST">
+                                <input type="hidden" name="orderId" value="<%= order.id %>">
+                                <button class="btn" type="submit">Cancel</button>
+                            </form>
                         </div>
                         <hr>
                         <div class="grid">
@@ -34,20 +38,9 @@
                                         </h2>
                                         
                                     </div>
-                                    <!-- <div class="card__actions">
-                                        <form action="/delete-from-cart" method="POST">
-                                            <input type="hidden" name="productId" value="<%= element.id %>">
-                                            <button class="btn" type="submit">Delete</button>
-                                        </form>
-                                    </div> -->
                                 </article>
                             <% }) %>
                         </div>
-                        <!-- <div class="centered">
-                            <form action="/create-order" method="POST">
-                                <button class="btn" type="submit">Order Now</button>
-                            </form>
-                        </div> -->
                     <% }) %>
                     
                 <% } else { %>
