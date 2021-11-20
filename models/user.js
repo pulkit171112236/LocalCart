@@ -1,3 +1,23 @@
+// User {
+//   _id,
+//   name,
+//   email,
+//   cart {
+//     items [
+//       { productId, quantity }
+//     ]
+//   }
+// }
+
+// Order {
+//   _id,
+//   userId,
+//   username,
+//   items [
+//     {productId, quantity }
+//   ]
+// }
+
 const { ObjectId } = require('mongodb')
 const { getDb } = require('../util/database')
 const Product = require('./product')
@@ -39,6 +59,57 @@ class User {
         },
       }
     )
+  }
+
+  getCart() {
+    const db = getDb()
+    const cart = this.cart
+    return db
+      .collection('products')
+      .find({ _id: { $in: cart.items.map((item) => item.productId) } })
+      .toArray()
+      .then((products) => {
+        cart.items = cart.items.map((item) => {
+          const product = products.find((product) => {
+            return product._id.toString() === item.productId.toString()
+          })
+          return { ...item, details: product }
+        })
+      })
+      .then(() => {
+        return cart
+      })
+  }
+
+  deleteFromCart(productId) {
+    const db = getDb()
+    const updatedCart = { ...this.cart }
+    updatedCart.items = updatedCart.items.filter(
+      (item) => item.productId.toString() !== productId
+    )
+    return db
+      .collection('users')
+      .updateOne({ _id: this._id }, { $set: { cart: updatedCart } })
+  }
+
+  addOrder() {
+    const db = getDb()
+    return this.getCart().then((cart) => {
+      return db
+        .collection('orders')
+        .insertOne({ items: cart.items, userId: this._id, username: this.name })
+        .then(() => {
+          const updatedCart = { items: [] }
+          return db
+            .collection('users')
+            .updateOne({ _id: this._id }, { $set: { cart: updatedCart } })
+        })
+    })
+  }
+
+  getOrders() {
+    const db = getDb()
+    return db.collection('orders').find({ userId: this._id }).toArray()
   }
 
   static getById(userId) {

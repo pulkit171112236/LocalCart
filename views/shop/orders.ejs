@@ -8,38 +8,38 @@
                 <% if (orders.length > 0) { %>
                     <% orders.forEach(order => { %>
                         <div class="total_price__bar centered">
-                            <p>OrderId: <%= order.id %></p>
+                            <p>OrderId: <%= order._id %></p>
                         </div>
                         <hr>
                         <div class="grid">
-                            <% order.products.forEach(element => { %>
+                            <% order.items.forEach(element => { %>
                                 <article class="card product-item">
                                     <header class="card__header">
                                         <h1 class="product__title">
-                                            <%= element.title %>
+                                            <%= element.details.title %>
                                         </h1>
                                     </header>
                                     <div class="card__image">
-                                        <img src="<%= element.imageUrl %>" alt="<%= element.title %>">
+                                        <img src="<%= element.details.imageUrl %>" alt="<%= element.details.title %>">
                                     </div>
                                     <div class="card__content">
                                         <h2 class="product__price">
-                                            ₹<%= element.price %>
+                                            ₹<%= element.details.price %>
                                         </h2>
                                         <p class="product__description">
-                                            <%= element.description %>
+                                            <%= element.details.description %>
                                         </p>
                                         <h2 class="product__price">
-                                            Qty: <%= element.orderItem.quantity %>
+                                            Qty: <%= element.quantity %>
                                         </h2>
                                         
                                     </div>
-                                    <!-- <div class="card__actions">
+                                    <div class="card__actions">
                                         <form action="/delete-from-cart" method="POST">
-                                            <input type="hidden" name="productId" value="<%= element.id %>">
+                                            <input type="hidden" name="productId" value="<%= element.productId %>">
                                             <button class="btn" type="submit">Delete</button>
                                         </form>
-                                    </div> -->
+                                    </div>
                                 </article>
                             <% }) %>
                         </div>

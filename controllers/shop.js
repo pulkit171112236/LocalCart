@@ -42,12 +42,14 @@ exports.getProduct = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   const user = req.user
-  const cart = user.cart
-  res.render('shop/cart', {
-    pageTitle: 'Cart',
-    path: '/cart',
-    cart: cart.items,
-    totalPrice: 0,
+  user.getCart().then((cart) => {
+    // cart.items = cart.items.map((item) => item.product)
+    res.render('shop/cart', {
+      pageTitle: 'Cart',
+      path: '/cart',
+      cartItems: cart.items,
+      totalPrice: 0,
+    })
   })
 }
 
@@ -58,74 +60,42 @@ exports.postCart = (req, res, next) => {
   })
 }
 
-// exports.postDeleteFromCart = (req, res, next) => {
-//   const productId = req.body.productId
-//   const user = req.user
-//   user
-//     .getCart()
-//     .then((cart) => {
-//       return cart.getProducts({ where: { id: productId } })
-//     })
-//     .then((cartProducts) => {
-//       const cartProduct = cartProducts[0]
-//       return cartProduct.cartItem.destroy()
-//     })
-//     .then(() => {
-//       return res.redirect('/cart')
-//     })
-//     .catch((err) => {
-//       console.log('__error_deleting_from_cart__', err)
-//     })
-// }
+exports.postDeleteFromCart = (req, res, next) => {
+  const productId = req.body.productId
+  const user = req.user
+  user
+    .deleteFromCart(productId)
+    .then(() => {
+      return res.redirect('/cart')
+    })
+    .catch((err) => {
+      console.log('__error_deleting_from_cart__', err)
+    })
+}
 
-// exports.getOrders = (req, res, next) => {
-//   req.user
-//     .getOrders({ include: ['products'] })
-//     .then((orders) => {
-//       console.log(orders[0])
-//       res.render('shop/orders', {
-//         path: '/orders',
-//         pageTitle: 'Your Orders',
-//         orders: orders,
-//         totalPrice: 0,
-//       })
-//     })
-//     .catch((err) => {
-//       console.log('__error_getting_order__', err)
-//     })
-// }
+exports.getOrders = (req, res, next) => {
+  req.user.getOrders().then((orders) => {
+    res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Your Orders',
+      orders: orders,
+      totalPrice: 0,
+    })
+  })
+}
 
-// exports.postOrder = (req, res, next) => {
-//   let fetchedProducts
-//   let fetchedCart
-//   req.user
-//     .getCart()
-//     .then((cart) => {
-//       fetchedCart = cart
-//       return cart.getProducts()
-//     })
-//     .then((products) => {
-//       fetchedProducts = products
-//       return req.user.createOrder()
-//     })
-//     .then((order) => {
-//       return order.addProducts(
-//         fetchedProducts.map((product) => {
-//           product.orderItem = { quantity: product.cartItem.quantity }
-//           return product
-//         })
-//       )
-//     })
-//     .then(() => {
-//       return fetchedCart.setProducts(null)
-//     })
-//     .then(() => {
-//       res.redirect('/orders')
-//     })
-//     .catch((err) => {
-//       console.log('__error_creating_order__', err)
-//     })
-// }
+exports.postOrder = (req, res, next) => {
+  let fetchedProducts
+  let fetchedCart
+  req.user
+    .addOrder()
+    .then(() => {
+      res.redirect('/orders')
+    })
+    .catch((err) => {
+      console.log('__error_creating_order__', err)
+    })
+}
 
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/checkout', {
