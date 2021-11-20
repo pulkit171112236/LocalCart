@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use((req, res, next) => {
-  User.getById('61989da09d62b6224f879941').then((user) => {
+  User.getById('61993a0327b61406b515652e').then((user) => {
     req.user = new User(user.name, user.email, user.cart, user._id.toString())
     next()
   })
@@ -35,7 +35,7 @@ app.use(shopRoutes)
 
 mongoConnect((client) => {
   // console.log('client: ', client)
-  // const user = new User('admin', 'admin@mongodb')
+  // const user = new User('admin', 'admin@shop')
   // user.save().then(() => {
   //   console.log('user created!')
   // })

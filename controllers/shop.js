@@ -48,7 +48,7 @@ exports.getCart = (req, res, next) => {
       pageTitle: 'Cart',
       path: '/cart',
       cartItems: cart.items,
-      totalPrice: 0,
+      totalPrice: cart.totalPrice,
     })
   })
 }
@@ -79,7 +79,6 @@ exports.getOrders = (req, res, next) => {
       path: '/orders',
       pageTitle: 'Your Orders',
       orders: orders,
-      totalPrice: 0,
     })
   })
 }
@@ -101,20 +100,6 @@ exports.postDeleteOrder = (req, res, next) => {
   const orderId = req.body.orderId
   req.user
     .deleteOrder(orderId)
-
-    // req.user
-    //   .getOrders({
-    //     where: { id: orderId },
-    //   })
-    //   .then((orders) => {
-    //     if (orders.length > 0) {
-    //       const order = orders[0]
-    //       console.log('order: ', order)
-    //       return req.user.removeOrder(order)
-    //     } else {
-    //       console.log('__error_no_order_to_delete__')
-    //     }
-    //   })
     .then(() => {
       res.redirect('./orders')
     })

@@ -11,7 +11,7 @@ exports.getAddProduct = (req, res, next) => {
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title
   const imageUrl = req.body.imageUrl
-  const price = req.body.price
+  const price = Number(req.body.price)
   const description = req.body.description
   const product = new Product(
     title,
@@ -45,7 +45,7 @@ exports.postEditProduct = (req, res, next) => {
   // fetch all details and save
   const prodId = req.body.productId
   const updatedTitle = req.body.title
-  const updatedPrice = req.body.price
+  const updatedPrice = Number(req.body.price)
   const updatedImgUrl = req.body.imageUrl
   const updatedDesc = req.body.description
   const product = new Product(
@@ -53,6 +53,7 @@ exports.postEditProduct = (req, res, next) => {
     updatedPrice,
     updatedImgUrl,
     updatedDesc,
+    req.user._id,
     prodId
   )
   product.save().then(() => {

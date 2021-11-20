@@ -7,45 +7,50 @@
             <main>
                 <% if (orders.length > 0) { %>
                     <% orders.forEach(order => { %>
-                        <div class="total_price__bar centered">
-                            <p>OrderId: <%= order._id %></p>
-                            <form action="/cancel-order" method="POST">
-                                <input type="hidden" name="orderId" value="<%= order._id %>">
-                                <button class="btn" type="submit">Cancel</button>
-                            </form>
-                        </div>
-                        <hr>
-                        <div class="grid">
-                            <% order.items.forEach(element => { %>
-                                <article class="card product-item">
-                                    <header class="card__header">
-                                        <h1 class="product__title">
-                                            <%= element.details.title %>
-                                        </h1>
-                                    </header>
-                                    <div class="card__image">
-                                        <img src="<%= element.details.imageUrl %>" alt="<%= element.details.title %>">
-                                    </div>
-                                    <div class="card__content">
-                                        <h2 class="product__price">
-                                            ₹<%= element.details.price %>
-                                        </h2>
-                                        <p class="product__description">
-                                            <%= element.details.description %>
-                                        </p>
-                                        <h2 class="product__price">
-                                            Qty: <%= element.quantity %>
-                                        </h2>
-                                        
-                                    </div>
-                                    <div class="card__actions">
-                                        <form action="/delete-from-cart" method="POST">
-                                            <input type="hidden" name="productId" value="<%= element.productId %>">
-                                            <button class="btn" type="submit">Delete</button>
-                                        </form>
-                                    </div>
-                                </article>
-                            <% }) %>
+                        <div class="order">
+                            <div class="total_price__bar centered">
+                                <div>
+                                    <p>OrderId: <%= order._id %> </p>
+                                    <p>Total Price: <%= order.totalPrice %></p>
+                                </div>
+                                <form action="/cancel-order" method="POST">
+                                    <input type="hidden" name="orderId" value="<%= order._id %>">
+                                    <button class="btn" type="submit">Cancel</button>
+                                </form>
+                            </div>
+                            <hr>
+                            <div class="grid">
+                                <% order.items.forEach(element => { %>
+                                    <article class="card product-item">
+                                        <header class="card__header">
+                                            <h1 class="product__title">
+                                                <%= element.details.title %>
+                                            </h1>
+                                        </header>
+                                        <div class="card__image">
+                                            <img src="<%= element.details.imageUrl %>" alt="<%= element.details.title %>">
+                                        </div>
+                                        <div class="card__content">
+                                            <h2 class="product__price">
+                                                ₹<%= element.details.price %>
+                                            </h2>
+                                            <p class="product__description">
+                                                <%= element.details.description %>
+                                            </p>
+                                            <h2 class="product__price">
+                                                Qty: <%= element.quantity %>
+                                            </h2>
+                                            
+                                        </div>
+                                        <div class="card__actions">
+                                            <form action="/delete-from-cart" method="POST">
+                                                <input type="hidden" name="productId" value="<%= element.productId %>">
+                                                <button class="btn" type="submit">Delete</button>
+                                            </form>
+                                        </div>
+                                    </article>
+                                <% }) %>
+                            </div>
                         </div>
                         <!-- <div class="centered">
                             <form action="/create-order" method="POST">

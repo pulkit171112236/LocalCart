@@ -6,10 +6,11 @@
         <%- include('../includes/navigation.ejs') %>
 
             <main>
-                <div class="total_price__bar">
-                    <p>TotalPrice: <%= totalPrice %></p>
-                </div>
                 <% if (cartItems.length > 0) { %>
+                    <div class="total_price__bar">
+                        <p>TotalPrice: <%= totalPrice %></p>
+                    </div>
+                    <hr>
                     <div class="grid">
                         <% for (let element of cartItems) { %>
                             <article class="card product-item">
@@ -35,7 +36,7 @@
                                 </div>
                                 <div class="card__actions">
                                     <form action="/delete-from-cart" method="POST">
-                                        <input type="hidden" name="productId" value="<%= element.detailsId %>">
+                                        <input type="hidden" name="productId" value="<%= element.productId %>">
                                         <button class="btn" type="submit">Delete</button>
                                     </form>
                                 </div>

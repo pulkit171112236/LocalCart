@@ -5,7 +5,7 @@
 //   cart {
 //     items [
 //       { productId, quantity }
-//     ]
+//     ],
 //   }
 // }
 
@@ -16,6 +16,7 @@
 //   items [
 //     {productId, quantity }
 //   ]
+//   totalPrice
 // }
 
 const { ObjectId } = require('mongodb')
@@ -64,19 +65,25 @@ class User {
   getCart() {
     const db = getDb()
     const cart = this.cart
+    cart.totalPrice = 0
     return db
       .collection('products')
       .find({ _id: { $in: cart.items.map((item) => item.productId) } })
       .toArray()
       .then((products) => {
-        cart.items = cart.items.map((item) => {
+        cart.items = cart.items.reduce((arr, item) => {
           const product = products.find((product) => {
             return product._id.toString() === item.productId.toString()
-          })
-          return { ...item, details: product }
-        })
-      })
-      .then(() => {
+          }, [])
+          if (product) {
+            arr.push({ ...item, details: product })
+            cart.totalPrice += product.price * item.quantity
+          } else {
+            // call async function for deleting object
+            this.deleteFromCart(item.productId.toString())
+          }
+          return arr
+        }, [])
         return cart
       })
   }
@@ -97,7 +104,12 @@ class User {
     return this.getCart().then((cart) => {
       return db
         .collection('orders')
-        .insertOne({ items: cart.items, userId: this._id, username: this.name })
+        .insertOne({
+          items: cart.items,
+          totalPrice: cart.totalPrice,
+          userId: this._id,
+          username: this.name,
+        })
         .then(() => {
           const updatedCart = { items: [] }
           return db

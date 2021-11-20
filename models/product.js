@@ -8,22 +8,13 @@
 const { ObjectId } = require('mongodb')
 const { getDb } = require('../util/database')
 class Product {
-  constructor(
-    title,
-    price,
-    imageUrl,
-    description,
-    userId = null,
-    prodId = null
-  ) {
-    console.log('typeof userid', typeof userId)
+  constructor(title, price, imageUrl, description, userId, prodId = null) {
     this.title = title
     this.price = price
     this.imageUrl = imageUrl
     this.description = description
     this.userId = userId ? new ObjectId(userId) : null
     this._id = prodId ? new ObjectId(prodId) : null
-    console.log('this product', this)
   }
 
   save() {
@@ -35,12 +26,6 @@ class Product {
           { _id: this._id },
           {
             $set: this,
-            // {
-            //   title: this.title,
-            //   price: this.price,
-            //   imageUrl: this.imageUrl,
-            //   description: this.description,
-            // },
           }
         )
         .catch((err) => {
@@ -82,7 +67,6 @@ class Product {
 
   static findById(prodId) {
     const db = getDb()
-    console.log()
     return db.collection('products').findOne({ _id: ObjectId(prodId) })
   }
 }

@@ -187,6 +187,15 @@ form {
   margin: 0 0.25rem;
 }
 
+.order {
+  margin-bottom: 10rem;
+}
+
+.total_price__bar {
+  font-weight: bold;
+  text-align: center;
+}
+
 .btn {
   display: inline-block;
   padding: 0.25rem 1rem;
