@@ -9,6 +9,10 @@
                     <% orders.forEach(order => { %>
                         <div class="total_price__bar centered">
                             <p>OrderId: <%= order._id %></p>
+                            <form action="/cancel-order" method="POST">
+                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                <button class="btn" type="submit">Cancel</button>
+                            </form>
                         </div>
                         <hr>
                         <div class="grid">

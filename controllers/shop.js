@@ -97,6 +97,32 @@ exports.postOrder = (req, res, next) => {
     })
 }
 
+exports.postDeleteOrder = (req, res, next) => {
+  const orderId = req.body.orderId
+  req.user
+    .deleteOrder(orderId)
+
+    // req.user
+    //   .getOrders({
+    //     where: { id: orderId },
+    //   })
+    //   .then((orders) => {
+    //     if (orders.length > 0) {
+    //       const order = orders[0]
+    //       console.log('order: ', order)
+    //       return req.user.removeOrder(order)
+    //     } else {
+    //       console.log('__error_no_order_to_delete__')
+    //     }
+    //   })
+    .then(() => {
+      res.redirect('./orders')
+    })
+    .catch((err) => {
+      console.log('__error_deleting_order__', err)
+    })
+}
+
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/checkout', {
 //     path: '/checkout',

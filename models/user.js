@@ -112,6 +112,11 @@ class User {
     return db.collection('orders').find({ userId: this._id }).toArray()
   }
 
+  deleteOrder(orderId) {
+    const db = getDb()
+    return db.collection('orders').deleteOne({ _id: ObjectId(orderId) })
+  }
+
   static getById(userId) {
     const db = getDb()
     return db
