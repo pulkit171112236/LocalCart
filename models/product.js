@@ -83,15 +83,7 @@ class Product {
   static findById(prodId) {
     const db = getDb()
     console.log()
-    return db
-      .collection('products')
-      .find({ _id: ObjectId(prodId) })
-      .toArray()
-      .then((products) => {
-        if (products.length > 0) {
-          return products[0]
-        } else throw 'no_product_found'
-      })
+    return db.collection('products').findOne({ _id: ObjectId(prodId) })
   }
 }
 

@@ -1,4 +1,5 @@
 const Product = require('../models/product')
+const User = require('../models/user')
 // const Cart = require('../models/cart')
 // const CartItem = require('../models/cart-item')
 // const Order = require('../models/order')
@@ -39,49 +40,23 @@ exports.getProduct = (req, res, next) => {
     })
 }
 
-// exports.getCart = (req, res, next) => {
-//   const user = req.user
-//   user.getCart().then((cart) => {
-//     cart.getProducts().then((products) => {
-//       res.render('shop/cart', {
-//         pageTitle: 'Cart',
-//         path: '/cart',
-//         cart: products,
-//         totalPrice: 0,
-//       })
-//     })
-//   })
-// }
+exports.getCart = (req, res, next) => {
+  const user = req.user
+  const cart = user.cart
+  res.render('shop/cart', {
+    pageTitle: 'Cart',
+    path: '/cart',
+    cart: cart.items,
+    totalPrice: 0,
+  })
+}
 
-// exports.postCart = (req, res, next) => {
-//   const prodId = req.body.productId
-//   const user = req.user
-//   let fetchedCart
-//   user
-//     .getCart()
-//     .then((cart) => {
-//       fetchedCart = cart
-//       return cart.getProducts({
-//         where: { id: prodId },
-//       })
-//     })
-//     .then((cartProducts) => {
-//       if (cartProducts.length > 0) {
-//         // already has
-//         const cartProduct = cartProducts[0]
-//         return fetchedCart.addProduct(cartProduct, {
-//           through: { quantity: cartProduct.cartItem.quantity + 1 },
-//         })
-//       } else {
-//         return Product.findByPk(prodId).then((product) => {
-//           return fetchedCart.addProduct(product, { through: { quantity: 1 } })
-//         })
-//       }
-//     })
-//     .then(() => {
-//       return res.redirect('/cart')
-//     })
-// }
+exports.postCart = (req, res, next) => {
+  const prodId = req.body.productId
+  req.user.addToCart(prodId).then(() => {
+    res.redirect('/cart')
+  })
+}
 
 // exports.postDeleteFromCart = (req, res, next) => {
 //   const productId = req.body.productId

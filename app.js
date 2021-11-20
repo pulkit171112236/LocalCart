@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use((req, res, next) => {
   User.getById('61989da09d62b6224f879941').then((user) => {
-    req.user = user
+    req.user = new User(user.name, user.email, user.cart, user._id.toString())
     next()
   })
 })
