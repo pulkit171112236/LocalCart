@@ -25,7 +25,7 @@
                 <textarea name="description" id="description" rows="5"><%= (locals.editing && editing === 'true') ? product.description : '' %></textarea>
             </div>
             <% if (locals.editing) { %> 
-                <input type="hidden" name="productId" value="<%= product.id %>">
+                <input type="hidden" name="productId" value="<%= product._id %>">
             <% } %>
             <button class="btn" type="submit"><%= locals.editing && editing === 'true' ? 'Update Product' : 'Add Product' %></button>
         </form>
