@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 // file-imports
 const errorController = require('./controllers/error')
 const { mongoConnect } = require('./util/database')
+const User = require('./models/user')
 
 const app = express()
 
@@ -20,14 +21,12 @@ const shopRoutes = require('./routes/shop')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-// app.use((req, res, next) => {
-//   User.findByPk(1)
-//     .then((user) => {
-//       req.user = user
-//       next()
-//     })
-//     .catch((err) => console.log('__error_attaching_user_to_request__', err))
-// })
+app.use((req, res, next) => {
+  User.getById('61989da09d62b6224f879941').then((user) => {
+    req.user = user
+    next()
+  })
+})
 
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
@@ -36,5 +35,9 @@ app.use(shopRoutes)
 
 mongoConnect((client) => {
   // console.log('client: ', client)
+  // const user = new User('admin', 'admin@mongodb')
+  // user.save().then(() => {
+  //   console.log('user created!')
+  // })
   app.listen(3000)
 })

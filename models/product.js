@@ -5,19 +5,28 @@
 //   price,
 //   id
 // }
-const mongodb = require('mongodb')
+const { ObjectId } = require('mongodb')
 const { getDb } = require('../util/database')
 class Product {
-  constructor(title, price, imageUrl, description, prodId = null) {
+  constructor(
+    title,
+    price,
+    imageUrl,
+    description,
+    userId = null,
+    prodId = null
+  ) {
+    console.log('typeof userid', typeof userId)
     this.title = title
     this.price = price
     this.imageUrl = imageUrl
     this.description = description
-    this._id = prodId ? new mongodb.ObjectId(prodId) : null
+    this.userId = userId ? new ObjectId(userId) : null
+    this._id = prodId ? new ObjectId(prodId) : null
+    console.log('this product', this)
   }
 
   save() {
-    console.log('id: ', this._id)
     const db = getDb()
     if (this._id) {
       return db
@@ -51,7 +60,7 @@ class Product {
     const db = getDb()
     return db
       .collection('products')
-      .deleteOne({ _id: mongodb.ObjectId(prodId) })
+      .deleteOne({ _id: ObjectId(prodId) })
       .catch((err) => {
         console.log('__error_deleting_product__')
       })
@@ -76,7 +85,7 @@ class Product {
     console.log()
     return db
       .collection('products')
-      .find({ _id: mongodb.ObjectId(prodId) })
+      .find({ _id: ObjectId(prodId) })
       .toArray()
       .then((products) => {
         if (products.length > 0) {
