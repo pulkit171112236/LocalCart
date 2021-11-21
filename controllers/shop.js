@@ -98,17 +98,16 @@ exports.postOrder = (req, res, next) => {
     })
 }
 
-// exports.postDeleteOrder = (req, res, next) => {
-//   const orderId = req.body.orderId
-//   req.user
-//     .deleteOrder(orderId)
-//     .then(() => {
-//       res.redirect('./orders')
-//     })
-//     .catch((err) => {
-//       console.log('__error_deleting_order__', err)
-//     })
-// }
+exports.postDeleteOrder = (req, res, next) => {
+  const orderId = req.body.orderId
+  Order.findByIdAndDelete(orderId)
+    .then(() => {
+      res.redirect('./orders')
+    })
+    .catch((err) => {
+      console.log('__error_deleting_order__', err)
+    })
+}
 
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/checkout', {

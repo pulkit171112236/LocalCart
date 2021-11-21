@@ -22,7 +22,7 @@ router.get('/orders', shopController.getOrders)
 
 router.post('/create-order', shopController.postOrder)
 
-// router.post('/cancel-order', shopController.postDeleteOrder)
+router.post('/cancel-order', shopController.postDeleteOrder)
 
 // router.get('/checkout', shopController.getCheckout)
 
