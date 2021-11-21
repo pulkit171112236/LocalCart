@@ -8,8 +8,8 @@ const mongoose = require('mongoose')
 
 // file-imports
 const errorController = require('./controllers/error')
+const User = require('./models/user')
 // const { mongoConnect } = require('./util/database')
-// const User = require('./models/user')
 
 const app = express()
 
@@ -22,12 +22,12 @@ const shopRoutes = require('./routes/shop')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-// app.use((req, res, next) => {
-//   User.getById('61993a0327b61406b515652e').then((user) => {
-//     req.user = new User(user.name, user.email, user.cart, user._id.toString())
-//     next()
-//   })
-// })
+app.use((req, res, next) => {
+  User.findById('619a034d711c3966da0c05b2').then((user) => {
+    req.user = user
+    next()
+  })
+})
 
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
@@ -40,6 +40,12 @@ mongoose
   .then((result) => {
     console.log('Connected!')
     // console.log('result', result)
+    // const user = User({
+    //   name: 'admin',
+    //   email: 'admin@shop',
+    //   items: [],
+    // })
+    // user.save()
     app.listen(3000)
   })
   .catch((err) => {
