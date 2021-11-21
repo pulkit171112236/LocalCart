@@ -12,17 +12,17 @@ router.get('/products', shopController.getProducts)
 
 router.get('/products/:productId', shopController.getProduct)
 
-router.get('/cart', shopController.getCart)
+// router.get('/cart', shopController.getCart)
 
-router.post('/cart', shopController.postCart)
+// router.post('/cart', shopController.postCart)
 
-router.post('/delete-from-cart', shopController.postDeleteFromCart)
+// router.post('/delete-from-cart', shopController.postDeleteFromCart)
 
-router.get('/orders', shopController.getOrders)
+// router.get('/orders', shopController.getOrders)
 
-router.post('/create-order', shopController.postOrder)
+// router.post('/create-order', shopController.postOrder)
 
-router.post('/cancel-order', shopController.postDeleteOrder)
+// router.post('/cancel-order', shopController.postDeleteOrder)
 
 // router.get('/checkout', shopController.getCheckout)
 
