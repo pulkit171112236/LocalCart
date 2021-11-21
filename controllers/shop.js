@@ -79,7 +79,6 @@ exports.postDeleteFromCart = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   Order.find({ userId: req.user._id }).then((orders) => {
-    console.log('orders[0].items', orders[0].items)
     res.render('shop/orders', {
       path: '/orders',
       pageTitle: 'Your Orders',

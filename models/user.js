@@ -68,13 +68,12 @@ userSchema.methods.getCart = function () {
           })
         } else {
           // delete the item from cart temporarily
-          user.cart.items.splice(i, 1)
+          this.cart.items.splice(i, 1)
         }
         return arr
       }, [])
-      // asynchronously save user deleting unmapped cart items
-      user.save()
-      return cart
+      //save user deleting unmapped cart items
+      return this.save().then(() => cart)
     })
     .catch((err) => {
       console.log('err:', err)
@@ -89,15 +88,20 @@ userSchema.methods.deleteFromCart = function (productId) {
 }
 
 userSchema.methods.addOrder = function () {
-  return this.getCart().then((cart) => {
-    const order = new Order({
-      items: cart.items,
-      totalPrice: cart.totalPrice,
-      userId: this._id,
-      username: this.name,
+  return this.getCart()
+    .then((cart) => {
+      const order = new Order({
+        items: cart.items,
+        totalPrice: cart.totalPrice,
+        userId: this._id,
+        username: this.name,
+      })
+      return order.save()
     })
-    return order.save()
-  })
+    .then(() => {
+      this.cart = { items: [] }
+      return this.save()
+    })
 }
 
 module.exports = mongoose.model('User', userSchema)
