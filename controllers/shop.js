@@ -1,5 +1,6 @@
 const Product = require('../models/product')
 const User = require('../models/user')
+const Order = require('../models/order')
 // const Cart = require('../models/cart')
 // const CartItem = require('../models/cart-item')
 // const Order = require('../models/order')
@@ -76,28 +77,27 @@ exports.postDeleteFromCart = (req, res, next) => {
     })
 }
 
-// exports.getOrders = (req, res, next) => {
-//   req.user.getOrders().then((orders) => {
-//     res.render('shop/orders', {
-//       path: '/orders',
-//       pageTitle: 'Your Orders',
-//       orders: orders,
-//     })
-//   })
-// }
+exports.getOrders = (req, res, next) => {
+  Order.find({ userId: req.user._id }).then((orders) => {
+    console.log('orders[0].items', orders[0].items)
+    res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Your Orders',
+      orders: orders,
+    })
+  })
+}
 
-// exports.postOrder = (req, res, next) => {
-//   let fetchedProducts
-//   let fetchedCart
-//   req.user
-//     .addOrder()
-//     .then(() => {
-//       res.redirect('/orders')
-//     })
-//     .catch((err) => {
-//       console.log('__error_creating_order__', err)
-//     })
-// }
+exports.postOrder = (req, res, next) => {
+  req.user
+    .addOrder()
+    .then(() => {
+      res.redirect('/orders')
+    })
+    .catch((err) => {
+      console.log('__error_creating_order__', err)
+    })
+}
 
 // exports.postDeleteOrder = (req, res, next) => {
 //   const orderId = req.body.orderId

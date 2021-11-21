@@ -9,20 +9,11 @@
 //   }
 // }
 
-// Order {
-//   _id,
-//   userId,
-//   username,
-//   items [
-//     {productId, quantity }
-//   ]
-//   totalPrice
-// }
-
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const Product = require('../models/product')
+const Order = require('../models/order')
 
 const userSchema = Schema({
   name: {
@@ -71,7 +62,7 @@ userSchema.methods.getCart = function () {
         if (item.productId) {
           cart.totalPrice += item.productId.price
           arr.push({
-            details: item.productId,
+            details: { ...item.productId._doc },
             quantity: item.quantity,
             productId: item._id,
           })
@@ -95,6 +86,18 @@ userSchema.methods.deleteFromCart = function (productId) {
     (item) => item._id.toString() !== productId
   )
   return this.save()
+}
+
+userSchema.methods.addOrder = function () {
+  return this.getCart().then((cart) => {
+    const order = new Order({
+      items: cart.items,
+      totalPrice: cart.totalPrice,
+      userId: this._id,
+      username: this.name,
+    })
+    return order.save()
+  })
 }
 
 module.exports = mongoose.model('User', userSchema)
