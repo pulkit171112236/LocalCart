@@ -64,18 +64,17 @@ exports.postCart = (req, res, next) => {
   })
 }
 
-// exports.postDeleteFromCart = (req, res, next) => {
-//   const productId = req.body.productId
-//   const user = req.user
-//   user
-//     .deleteFromCart(productId)
-//     .then(() => {
-//       return res.redirect('/cart')
-//     })
-//     .catch((err) => {
-//       console.log('__error_deleting_from_cart__', err)
-//     })
-// }
+exports.postDeleteFromCart = (req, res, next) => {
+  const productId = req.body.productId
+  req.user
+    .deleteFromCart(productId)
+    .then(() => {
+      return res.redirect('/cart')
+    })
+    .catch((err) => {
+      console.log('__error_deleting_from_cart__', err)
+    })
+}
 
 // exports.getOrders = (req, res, next) => {
 //   req.user.getOrders().then((orders) => {

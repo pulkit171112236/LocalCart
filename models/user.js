@@ -90,4 +90,11 @@ userSchema.methods.getCart = function () {
     })
 }
 
+userSchema.methods.deleteFromCart = function (productId) {
+  this.cart.items = this.cart.items.filter(
+    (item) => item._id.toString() !== productId
+  )
+  return this.save()
+}
+
 module.exports = mongoose.model('User', userSchema)
