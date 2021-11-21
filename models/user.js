@@ -60,7 +60,7 @@ userSchema.methods.getCart = function () {
       const cart = { totalPrice: 0 }
       cart.items = user.cart.items.reduce((arr, item, i) => {
         if (item.productId) {
-          cart.totalPrice += item.productId.price
+          cart.totalPrice += item.productId.price * item.quantity
           arr.push({
             details: { ...item.productId._doc },
             quantity: item.quantity,
