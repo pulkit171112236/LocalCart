@@ -5,6 +5,7 @@ const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const session = require('express-session')
 
 // file-imports
 const errorController = require('./controllers/error')
@@ -22,6 +23,13 @@ const authRoutes = require('./routes/auth')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(
+  session({
+    secret: 'a long string as secret',
+    resave: false,
+    saveUninitialized: false,
+  })
+)
 
 app.use((req, res, next) => {
   User.findById('619a034d711c3966da0c05b2').then((user) => {
