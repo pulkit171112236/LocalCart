@@ -7,11 +7,19 @@ const Order = require('../models/order')
 // const OrderItem = require('../models/order-item')
 
 exports.getIndex = (req, res, next) => {
+  let isLogged = false
+  const isLoggedCookie = req.headers['cookie']
+    .split(';')
+    .find((word) => word.includes('isLogged'))
+  if (isLoggedCookie && isLoggedCookie.split('=')[1] === 'true') {
+    isLogged = true
+  }
   Product.find().then((products) => {
     res.render('shop/index', {
       prods: products,
       pageTitle: 'Shop',
       path: '/',
+      isAuthenticated: isLogged,
     })
   })
 }
