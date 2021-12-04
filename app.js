@@ -6,12 +6,21 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const session = require('express-session')
+const MongoDbStore = require('connect-mongodb-session')(session)
 
 // file-imports
 const errorController = require('./controllers/error')
 const User = require('./models/user')
 
+// constants
+const MONGODB_URI =
+  'mongodb+srv://pulkit:OnhmMgr8fEqagTZs@cluster0.qgwii.mongodb.net/shop?retryWrites=true&w=majority'
+
 const app = express()
+const mongodbStore = MongoDbStore({
+  uri: MONGODB_URI,
+  collection: 'sessions',
+})
 
 app.set('view engine', 'ejs')
 app.set('views', 'views')
@@ -28,6 +37,7 @@ app.use(
     secret: 'a long string as secret',
     resave: false,
     saveUninitialized: false,
+    store: mongodbStore,
   })
 )
 
@@ -44,9 +54,7 @@ app.use(authRoutes)
 app.use(errorController.get404)
 
 mongoose
-  .connect(
-    'mongodb+srv://pulkit:OnhmMgr8fEqagTZs@cluster0.qgwii.mongodb.net/shop?retryWrites=true&w=majority'
-  )
+  .connect(MONGODB_URI)
   .then((result) => {
     console.log('Connected!')
     // console.log('result', result)
