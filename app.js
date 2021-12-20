@@ -14,7 +14,7 @@ const User = require('./models/user')
 
 // constants
 const MONGODB_URI =
-  'mongodb+srv://pulkit:OnhmMgr8fEqagTZs@cluster0.qgwii.mongodb.net/shop?retryWrites=true&w=majority'
+  'mongodb+srv://pulkit:5tEvPesz6qA3izWh@cluster0.qgwii.mongodb.net/shop?retryWrites=true&w=majority'
 
 const app = express()
 const mongodbStore = MongoDbStore({
