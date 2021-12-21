@@ -30,6 +30,7 @@ const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 const authRoutes = require('./routes/auth')
 
+// middlewares
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(
@@ -42,10 +43,14 @@ app.use(
 )
 
 app.use((req, res, next) => {
-  User.findById('619a034d711c3966da0c05b2').then((user) => {
-    req.user = user
+  if (!req.session.user) {
     next()
-  })
+  } else {
+    User.findById(req.session.user._id).then((user) => {
+      req.user = user
+      next()
+    })
+  }
 })
 
 app.use('/admin', adminRoutes)
