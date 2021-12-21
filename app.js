@@ -2,6 +2,7 @@
 const path = require('path')
 
 // third-party-imports
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
@@ -13,8 +14,7 @@ const errorController = require('./controllers/error')
 const User = require('./models/user')
 
 // constants
-const MONGODB_URI =
-  'mongodb+srv://pulkit:5tEvPesz6qA3izWh@cluster0.qgwii.mongodb.net/shop?retryWrites=true&w=majority'
+const MONGODB_URI = process.env.MONGODB_URI
 
 const app = express()
 const mongodbStore = MongoDbStore({
@@ -53,6 +53,7 @@ app.use(shopRoutes)
 app.use(authRoutes)
 app.use(errorController.get404)
 
+const PORT = process.env.PORT || 3000
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
@@ -64,7 +65,7 @@ mongoose
     //   items: [],
     // })
     // user.save()
-    app.listen(3000)
+    app.listen(PORT)
   })
   .catch((err) => {
     console.log('client_not_connected', err)
