@@ -8,12 +8,12 @@
     <main>
         <form class="login-form" action="/login" method="POST">
             <div class="form-control">
-                <label for="title">Title</label>
-                <input type="text" name="title" id="title" value="<%= (locals.editing && editing === 'true') ? product.title : '' %>">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username">
             </div>
             <div class="form-control">
-                <label for="imageUrl">Image URL</label>
-                <input type="text" name="imageUrl" id="imageUrl" value="<%= (locals.editing && editing === 'true') ? product.imageUrl : '' %>">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password">
             </div>
             <button class="btn" type="submit">Login</button>
         </form>
