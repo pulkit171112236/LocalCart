@@ -43,10 +43,16 @@ app.use(
 )
 
 app.use((req, res, next) => {
-  User.findById('619a034d711c3966da0c05b2').then((user) => {
-    req.user = user
+  console.log('req.session:', req.session)
+  if (!req.session.user) {
+    console.log('next')
     next()
-  })
+  } else {
+    User.findById(req.session.user._id).then((user) => {
+      req.user = user
+      next()
+    })
+  }
 })
 
 app.use('/admin', adminRoutes)
