@@ -43,9 +43,7 @@ app.use(
 )
 
 app.use((req, res, next) => {
-  console.log('req.session:', req.session)
   if (!req.session.user) {
-    console.log('next')
     next()
   } else {
     User.findById(req.session.user._id).then((user) => {
