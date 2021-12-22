@@ -32,7 +32,7 @@ const orderSchema = Schema({
     ref: 'User',
     required: true,
   },
-  username: String,
+  userEmail: String,
 })
 
 module.exports = mongoose.model('Order', orderSchema)
