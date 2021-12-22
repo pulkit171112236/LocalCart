@@ -4,9 +4,14 @@ const { response } = require('express')
 const User = require('../models/user')
 
 exports.getLogin = (req, res, next) => {
+  let errorMsg = req.flash('error')
+  if (errorMsg.length > 0) {
+    errorMsg = errorMsg[0]
+  } else errorMsg = null
   return res.render('auth/login', {
     pageTitle: 'Login',
     path: '/login',
+    errorMsg,
   })
 }
 
@@ -29,10 +34,12 @@ exports.postLogin = (req, res, next) => {
               }
             })
           } else {
+            req.flash('error', 'Invalid password')
             return res.redirect('/login')
           }
         })
       } else {
+        req.flash('error', 'Username not registered')
         return res.redirect('/login')
       }
     })
@@ -47,9 +54,14 @@ exports.postLogout = (req, res, next) => {
 }
 
 exports.getSignup = (req, res, next) => {
+  let errorMsg = req.flash('error')
+  if (errorMsg.length > 0) {
+    errorMsg = errorMsg[0]
+  } else errorMsg = null
   return res.render('auth/signup', {
     pageTitle: 'Signup',
     path: '/signup',
+    errorMsg,
   })
 }
 
@@ -59,7 +71,8 @@ exports.postSignup = (req, res, next) => {
     .then((user) => {
       // if user already exists
       if (user) {
-        return res.redirect('/login')
+        req.flash('error', 'E-mail exists! pick a different one.')
+        return res.redirect('/signup')
       }
       // create a hash of the password
       return bcryptjs
