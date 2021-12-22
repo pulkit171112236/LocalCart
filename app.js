@@ -7,9 +7,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const session = require('express-session')
+const flash = require('connect-flash')
 const MongoDbStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
-
 // file-imports
 const errorController = require('./controllers/error')
 const User = require('./models/user')
@@ -44,6 +44,7 @@ app.use(
     store: mongodbStore,
   })
 )
+app.use(flash())
 app.use(csrf())
 
 // attaching csrfToken and isAuthenticated to response so they are available to all views which renders
@@ -74,13 +75,6 @@ mongoose
   .connect(MONGODB_URI)
   .then((result) => {
     console.log('Connected!')
-    // console.log('result', result)
-    // const user = User({
-    //   name: 'admin',
-    //   email: 'admin@shop',
-    //   items: [],
-    // })
-    // user.save()
     app.listen(PORT)
   })
   .catch((err) => {
