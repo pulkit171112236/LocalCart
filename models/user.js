@@ -98,7 +98,7 @@ userSchema.methods.addOrder = function () {
         items: cart.items,
         totalPrice: cart.totalPrice,
         userId: this._id,
-        username: this.name,
+        userEmail: this.email,
       })
       return order.save()
     })
