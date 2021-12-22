@@ -31,3 +31,14 @@ exports.getLogout = (req, res, next) => {
   req.session.destroy()
   return res.redirect('/')
 }
+
+exports.getSignup = (req, res, next) => {
+  return res.render('auth/signup', {
+    pageTitle: 'Signup',
+    path: '/signup',
+  })
+}
+
+exports.postSignup = (req, res, next) => {
+  return res.render('auth/signup')
+}
