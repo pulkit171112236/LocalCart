@@ -15,6 +15,7 @@
                                 </div>
                                 <form action="/cancel-order" method="POST">
                                     <input type="hidden" name="orderId" value="<%= order._id %>">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <button class="btn" type="submit">Cancel</button>
                                 </form>
                             </div>
@@ -45,6 +46,7 @@
                                         <div class="card__actions">
                                             <form action="/delete-from-cart" method="POST">
                                                 <input type="hidden" name="productId" value="<%= element.productId %>">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                                 <button class="btn" type="submit">Delete</button>
                                             </form>
                                         </div>
@@ -54,6 +56,7 @@
                         </div>
                         <!-- <div class="centered">
                             <form action="/create-order" method="POST">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <button class="btn" type="submit">Order Now</button>
                             </form>
                         </div> -->

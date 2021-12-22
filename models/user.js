@@ -18,9 +18,13 @@ const Order = require('../models/order')
 const userSchema = Schema({
   name: {
     type: String,
-    required: true,
+    required: false,
   },
   email: {
+    type: String,
+    required: true,
+  },
+  password: {
     type: String,
     required: true,
   },
@@ -94,7 +98,7 @@ userSchema.methods.addOrder = function () {
         items: cart.items,
         totalPrice: cart.totalPrice,
         userId: this._id,
-        username: this.name,
+        userEmail: this.email,
       })
       return order.save()
     })

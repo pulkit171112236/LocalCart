@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const session = require('express-session')
 const MongoDbStore = require('connect-mongodb-session')(session)
+const csrf = require('csurf')
 
 // file-imports
 const errorController = require('./controllers/error')
@@ -16,12 +17,14 @@ const User = require('./models/user')
 // constants
 const MONGODB_URI = process.env.MONGODB_URI
 
+// required objects
 const app = express()
 const mongodbStore = MongoDbStore({
   uri: MONGODB_URI,
   collection: 'sessions',
 })
 
+// set view-engine
 app.set('view engine', 'ejs')
 app.set('views', 'views')
 
@@ -41,6 +44,14 @@ app.use(
     store: mongodbStore,
   })
 )
+app.use(csrf())
+
+// attaching csrfToken and isAuthenticated to response so they are available to all views which renders
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken()
+  res.locals.isAuthenticated = req.session.isLogged
+  next()
+})
 
 app.use((req, res, next) => {
   if (!req.session.user) {
