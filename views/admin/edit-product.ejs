@@ -27,6 +27,7 @@
             <% if (locals.editing) { %> 
                 <input type="hidden" name="productId" value="<%= product._id %>">
             <% } %>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button class="btn" type="submit"><%= locals.editing && editing === 'true' ? 'Update Product' : 'Add Product' %></button>
         </form>
     </main>

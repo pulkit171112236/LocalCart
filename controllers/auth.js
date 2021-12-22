@@ -17,7 +17,6 @@ exports.postLogin = (req, res, next) => {
     .then((user) => {
       if (user) {
         bcryptjs.compare(password, user.password).then((doMatch) => {
-          console.log('compared hash')
           if (doMatch) {
             // attach the user to the session
             req.session.user = { _id: user._id }
@@ -34,7 +33,6 @@ exports.postLogin = (req, res, next) => {
           }
         })
       } else {
-        console.log('called redirect')
         return res.redirect('/login')
       }
     })
