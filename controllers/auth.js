@@ -1,6 +1,9 @@
 const bcryptjs = require('bcryptjs')
+const { EDESTADDRREQ } = require('constants')
+const crypto = require('crypto')
 const nodemailer = require('nodemailer')
 const sendgridTransport = require('nodemailer-sendgrid-transport')
+const { reset } = require('nodemon')
 
 const User = require('../models/user')
 
@@ -93,7 +96,7 @@ exports.postSignup = (req, res, next) => {
         .then((result) => {
           res.redirect('/login')
           return transporter.sendMail({
-            from: 'pulkit171112236@gmail.com',
+            from: process.env.MAIL_USER,
             to: email,
             subject: 'Signup',
             html: '<h1>Signup Succeeded</h1>',
@@ -105,5 +108,114 @@ exports.postSignup = (req, res, next) => {
     })
     .catch((err) => {
       console.log('__error_while_signing__', err)
+    })
+}
+
+exports.getResetPassword = (req, res, next) => {
+  let errorMsg = req.flash('error')
+  if (errorMsg.length > 0) {
+    errorMsg = errorMsg[0]
+  } else errorMsg = null
+  return res.render('auth/reset', {
+    pageTitle: 'Reset',
+    path: '/reset',
+    errorMsg,
+  })
+}
+
+exports.postResetPassword = (req, res, next) => {
+  const email = req.body.email
+  User.findOne({ email: email }).then((user) => {
+    if (!user) {
+      req.flash('error', 'Email not correct')
+      return res.redirect('/reset')
+    }
+    // create a random token
+    crypto.randomBytes(32, (err, buffer) => {
+      if (err) {
+        console.log('__err_creating_reset_token__', err)
+        return res.redirect('/')
+      }
+      const resetToken = buffer.toString('hex')
+      user.resetToken = resetToken
+      user.resetTokenExpiration = Date.now() + 360000
+      user
+        .save()
+        .then(() => {
+          res.redirect('/')
+          return transporter.sendMail({
+            from: process.env.MAIL_USER,
+            to: email,
+            subject: 'Reset Password',
+            html: `
+            <div>Click on <a href="${process.env.APP_BASE_URL}/reset/${resetToken}/">Link</a> to reset your localkart password.</div>
+          `,
+          })
+        })
+        .catch((err) => {
+          console.log('__error_when_sending_reset_token__')
+        })
+    })
+  })
+}
+
+exports.getChangePassword = (req, res, next) => {
+  let errorMsg = req.flash('error')
+  if (errorMsg.length > 0) {
+    errorMsg = errorMsg[0]
+  } else errorMsg = null
+  const resetToken = req.params.token
+  User.findOne({
+    resetToken: resetToken,
+    resetTokenExpiration: { $gt: Date.now() },
+  })
+    .then((user) => {
+      if (!user) {
+        req.flash('error', 'Token not valid or token expired')
+        return res.redirect('/reset')
+      }
+      return res.render('auth/change-password', {
+        pageTitle: 'Change Password',
+        path: '',
+        errorMsg: errorMsg,
+        userId: user._id.toString(),
+        resetToken: resetToken,
+      })
+    })
+    .catch((err) => {
+      console.log('__error_while_looking_for_token_in_database__', err)
+    })
+}
+
+exports.postChangePassword = (req, res, next) => {
+  const { password, confirmedPassword, resetToken, userId } = req.body
+  if (password !== confirmedPassword) {
+    req.flash('error', 'Passwords do not match')
+    return res.redirect('/reset/' + resetToken)
+  }
+  User.findOne({
+    resetToken: resetToken,
+    resetTokenExpiration: { $gt: Date.now() },
+    _id: userId,
+  })
+    .then((user) => {
+      if (!user) {
+        req.flash('error', 'Link Expired')
+        return res.redirect('/reset')
+      }
+      bcryptjs
+        .hash(password, 12)
+        .then((hash) => {
+          user.password = hash
+          user.resetToken = undefined
+          user.resetTokenExpiration = undefined
+          return user.save()
+        })
+        .then((saveResult) => {
+          return res.redirect('/login')
+        })
+    })
+    .catch((err) => {
+      console.log('__err_while_looking_token_in_db__', err)
     })
 }
