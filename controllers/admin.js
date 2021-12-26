@@ -38,6 +38,9 @@ exports.getEditProduct = (req, res, next) => {
   }
   const prodId = req.params.productId
   Product.findById(prodId).then((product) => {
+    if (product.userId.toString() !== req.user._id.toString()) {
+      return res.redirect('/')
+    }
     res.render('admin/edit-product', {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
@@ -57,6 +60,9 @@ exports.postEditProduct = (req, res, next) => {
   const updatedDesc = req.body.description
 
   Product.findById(prodId).then((product) => {
+    if (product.userId.toString() !== req.user._id.toString()) {
+      return res.redirect('/')
+    }
     product.title = updatedTitle
     product.imageUrl = updatedImgUrl
     product.price = updatedPrice
@@ -69,9 +75,11 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId
-  Product.findByIdAndDelete(productId).then(() => {
-    res.redirect('/admin/products')
-  })
+  Product.findOneAndDelete({ productId: productId, userId: req.user._id }).then(
+    () => {
+      res.redirect('/admin/products')
+    }
+  )
 }
 
 exports.getProducts = (req, res, next) => {
