@@ -1,3 +1,6 @@
+const path = require('path')
+const fs = require('fs')
+
 const Product = require('../models/product')
 
 exports.getAddProduct = (req, res, next) => {
@@ -101,4 +104,18 @@ exports.getProducts = (req, res, next) => {
       isAuthenticated: req.session.isLogged,
     })
   })
+}
+
+exports.getInvoice = (req, res, next) => {
+  const invoiceNo = req.params['orderId']
+  const filePath = path.join(
+    __dirname,
+    '..',
+    'data',
+    'invoice',
+    invoiceNo + '.pdf'
+  )
+  if (fs.existsSync(filePath)) {
+    return res.download(filePath)
+  } else return res.redirect('/404')
 }
