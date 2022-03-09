@@ -115,7 +115,8 @@ exports.getInvoice = (req, res, next) => {
     'invoice',
     invoiceNo + '.pdf'
   )
-  if (fs.existsSync(filePath)) {
-    return res.download(filePath)
-  } else return res.redirect('/404')
+  const file = fs.createReadStream(filePath)
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Disposition', `attachment; filename="test.pdf"`)
+  file.pipe(res)
 }
