@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 
 const Product = require('../models/product')
+const Order = require('../models/order')
 
 exports.getAddProduct = (req, res, next) => {
   let errorMsg = req.flash('error')
@@ -108,7 +109,8 @@ exports.getProducts = (req, res, next) => {
 }
 
 exports.getInvoice = (req, res, next) => {
-  const invoiceNo = req.params['orderId']
+  const orderId = req.params['orderId']
+  const invoiceNo = orderId
   const filePath = path.join(
     __dirname,
     '..',
@@ -118,7 +120,22 @@ exports.getInvoice = (req, res, next) => {
   )
   const pdfDoc = new pdfkit()
   pdfDoc.pipe(fs.createWriteStream(filePath))
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Disposition', 'inline')
   pdfDoc.pipe(res)
-  pdfDoc.text('test-pdf')
-  pdfDoc.end()
+  pdfDoc.fontSize(24).text('Invoice')
+  pdfDoc.text('---------------------')
+  Order.findById(orderId)
+    .then((order) => {
+      order.items.forEach((item) => {
+        pdfDoc.text('product-id: ' + item.productId)
+        pdfDoc.text('title: ' + item.details.title)
+        pdfDoc.text('description: ' + item.details.description)
+        pdfDoc.text('price: ' + item.details.price)
+        pdfDoc.text('----------------------------------------')
+      })
+    })
+    .then(() => {
+      pdfDoc.end()
+    })
 }
