@@ -1,3 +1,4 @@
+const pdfkit = require('pdfkit')
 const path = require('path')
 const fs = require('fs')
 
@@ -115,8 +116,9 @@ exports.getInvoice = (req, res, next) => {
     'invoice',
     invoiceNo + '.pdf'
   )
-  const file = fs.createReadStream(filePath)
-  res.setHeader('Content-Type', 'application/pdf')
-  res.setHeader('Content-Disposition', `attachment; filename="test.pdf"`)
-  file.pipe(res)
+  const pdfDoc = new pdfkit()
+  pdfDoc.pipe(fs.createWriteStream(filePath))
+  pdfDoc.pipe(res)
+  pdfDoc.text('test-pdf')
+  pdfDoc.end()
 }
