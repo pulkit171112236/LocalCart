@@ -1,27 +1,49 @@
 const Product = require('../models/product')
 const Order = require('../models/order')
 
+const ITEMS_PER_PAGE = 2
+
 exports.getIndex = (req, res, next) => {
+  const currPage = +req.query.page || 1
   const isLogged = req.session.isLogged
-  Product.find().then((products) => {
-    res.render('shop/index', {
-      prods: products,
-      pageTitle: 'Shop',
-      path: '/',
-      isAuthenticated: req.session.isLogged,
+  Product.find()
+    .countDocuments()
+    .then((numProducts) => {
+      return Product.find()
+        .skip((currPage - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+        .then((products) => {
+          return res.render('shop/index', {
+            prods: products,
+            pageTitle: 'Shop',
+            path: '/',
+            isAuthenticated: req.session.isLogged,
+            currPage: currPage,
+            hasNextPage: ITEMS_PER_PAGE * currPage < numProducts,
+          })
+        })
     })
-  })
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.find().then((products) => {
-    res.render('shop/product-list', {
-      prods: products,
-      pageTitle: 'All Products',
-      path: '/products',
-      isAuthenticated: req.session.isLogged,
+  const currPage = +req.query.page || 1
+  Product.find()
+    .countDocuments()
+    .then((numProducts) => {
+      return Product.find()
+        .skip((currPage - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+        .then((products) => {
+          return res.render('shop/product-list', {
+            prods: products,
+            pageTitle: 'All Products',
+            path: '/products',
+            isAuthenticated: req.session.isLogged,
+            currPage: currPage,
+            hasNextPage: ITEMS_PER_PAGE * currPage < numProducts,
+          })
+        })
     })
-  })
 }
 
 exports.getProduct = (req, res, next) => {
