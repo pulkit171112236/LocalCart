@@ -1,9 +1,12 @@
 const pdfkit = require('pdfkit')
 const path = require('path')
 const fs = require('fs')
+const multer = require('multer')
 
 const Product = require('../models/product')
 const Order = require('../models/order')
+
+const fileUtils = require('../util/file')
 
 exports.getAddProduct = (req, res, next) => {
   let errorMsg = req.flash('error')
@@ -72,29 +75,38 @@ exports.postEditProduct = (req, res, next) => {
   const updatedImage = req.file
   const updatedDesc = req.body.description
 
-  Product.findById(prodId).then((product) => {
-    if (product.userId.toString() !== req.user._id.toString()) {
-      return res.redirect('/')
-    }
-    product.title = updatedTitle
-    if (updatedImage) {
-      product.imageUrl = updatedImage.path
-    }
-    product.price = updatedPrice
-    product.description = updatedDesc
-    product.save().then(() => {
-      res.redirect('/admin/products')
+  Product.findById(prodId)
+    .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/')
+      }
+      product.title = updatedTitle
+      if (updatedImage) {
+        fileUtils.deleteFile(product.imageUrl)
+        product.imageUrl = updatedImage.path
+      }
+      product.price = updatedPrice
+      product.description = updatedDesc
+      product.save().then(() => {
+        res.redirect('/admin/products')
+      })
     })
-  })
+    .catch((err) => {
+      console.log('__error_while_editing_')
+      console.log(err)
+    })
 }
 
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId
-  Product.findOneAndDelete({ productId: productId, userId: req.user._id }).then(
-    () => {
+  Product.findById(productId)
+    .then((product) => {
+      fileUtils.deleteFile(product.imageUrl)
+      return Product.deleteOne({ _id: productId, userId: req.user._id })
+    })
+    .then(() => {
       res.redirect('/admin/products')
-    }
-  )
+    })
 }
 
 exports.getProducts = (req, res, next) => {
