@@ -37,13 +37,13 @@
                     </div>
                     <section class="pagination">
                         <% if(currPage > 1) { %>
-                            <a href="/products/?page=<%= currPage-1 %>"> << </a>
+                            <a href="/products/?page=<%= 1 %>"> << </a>
                             <a href="/products/?page=<%= currPage-1 %>"><%= currPage-1 %></a>
                         <% } %>
                         <a href="/products/?page=<%= currPage %>" class="active"><%= currPage %></a>
                         <% if(hasNextPage) { %>
                             <a href="/products/?page=<%= currPage+1 %>"><%= currPage+1 %></a>
-                            <a href="/products/?page=<%= currPage+1 %>"> >> </a>
+                            <a href="/products/?page=<%= lastPage %>"> >> </a>
                         <% } %>
                     </section>
                     <% } else { %>
