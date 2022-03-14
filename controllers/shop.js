@@ -19,7 +19,6 @@ exports.getIndex = (req, res, next) => {
             path: '/',
             isAuthenticated: req.session.isLogged,
             currPage: currPage,
-            hasNextPage: ITEMS_PER_PAGE * currPage < numProducts,
             lastPage: Math.ceil(numProducts / ITEMS_PER_PAGE),
           })
         })
@@ -41,7 +40,6 @@ exports.getProducts = (req, res, next) => {
             path: '/products',
             isAuthenticated: req.session.isLogged,
             currPage: currPage,
-            hasNextPage: ITEMS_PER_PAGE * currPage < numProducts,
             lastPage: Math.ceil(numProducts / ITEMS_PER_PAGE),
           })
         })
