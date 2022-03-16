@@ -1,5 +1,9 @@
+const path = require('path')
+
 const Product = require('../models/product')
 const Order = require('../models/order')
+
+const fileUtils = require('../util/file')
 
 const ITEMS_PER_PAGE = 2
 
@@ -121,6 +125,16 @@ exports.postDeleteOrder = (req, res, next) => {
   Order.findByIdAndDelete(orderId)
     .then(() => {
       res.redirect('./orders')
+      // deleting invoice if exists
+      const invoicePath = path.join(
+        fileUtils.ROOT_PATH,
+        'data',
+        'invoice',
+        `${orderId}.pdf`
+      )
+      if (fileUtils.exists(invoicePath)) {
+        fileUtils.deleteFile(invoicePath)
+      }
     })
     .catch((err) => {
       console.log('__error_deleting_order__', err)

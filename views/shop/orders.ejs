@@ -13,7 +13,7 @@
                                     <p>OrderId: <%= order._id %> </p>
                                     <p>Total Price: <%= order.totalPrice %></p>
                                     <h3 class="product__price">
-                                        <a href="/admin/invoice/<%=order.id%>">Download Invoice</a>
+                                        <a href="/admin/invoice/<%=order.id%>" target="_blank">Download Invoice</a>
                                     </h3>
                                 </div>
                                 <form action="/cancel-order" method="POST">
