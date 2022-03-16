@@ -18,10 +18,14 @@ router.post('/delete-from-cart', isAuth, shopController.postDeleteFromCart)
 
 router.get('/orders', isAuth, shopController.getOrders)
 
-router.post('/create-order', isAuth, shopController.postOrder)
+// router.post('/create-order', isAuth, shopController.postOrder)
 
 router.post('/cancel-order', isAuth, shopController.postDeleteOrder)
 
-// router.get('/checkout', shopController.getCheckout)
+router.get('/checkout', isAuth, shopController.getCheckout)
+
+router.get('/checkout/success', shopController.getCheckoutSuccess)
+
+router.get('/checkout/cancel', shopController.getCheckoutCancel)
 
 module.exports = router

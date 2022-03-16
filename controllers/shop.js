@@ -1,5 +1,9 @@
 const path = require('path')
 
+const stripe = require('stripe')(
+  'sk_test_51KduBoSBVfLszPhhacLZj9n8ITZ3kk4ElKEQtgEDrIqmuCU0zGcg8xFyj29VtUuGLasmvxh5XSihKZQmV6ituKR100dk5T1wz6'
+)
+
 const Product = require('../models/product')
 const Order = require('../models/order')
 
@@ -109,16 +113,16 @@ exports.getOrders = (req, res, next) => {
   })
 }
 
-exports.postOrder = (req, res, next) => {
-  req.user
-    .addOrder()
-    .then(() => {
-      res.redirect('/orders')
-    })
-    .catch((err) => {
-      console.log('__error_creating_order__', err)
-    })
-}
+// exports.postOrder = (req, res, next) => {
+//   req.user
+//     .addOrder()
+//     .then(() => {
+//       res.redirect('/orders')
+//     })
+//     .catch((err) => {
+//       console.log('__error_creating_order__', err)
+//     })
+// }
 
 exports.postDeleteOrder = (req, res, next) => {
   const orderId = req.body.orderId
@@ -139,4 +143,54 @@ exports.postDeleteOrder = (req, res, next) => {
     .catch((err) => {
       console.log('__error_deleting_order__', err)
     })
+}
+
+exports.getCheckout = (req, res, next) => {
+  const user = req.user
+  var products, totalPrice
+  user
+    .getCart()
+    .then((cart) => {
+      products = cart.items
+      totalPrice = cart.totalPrice
+      return stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: products.map((p) => {
+          return {
+            name: p.details.title || '<title>',
+            description: p.details.description || '<description>',
+            amount: p.details.price * 100,
+            currency: 'inr',
+            quantity: p.quantity,
+          }
+        }),
+        success_url: `${req.protocol}://${req.get('host')}/checkout/success`,
+        cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`,
+      })
+    })
+    .then((session) => {
+      res.render('shop/checkout', {
+        pageTitle: 'Checkout',
+        path: '/checkout',
+        cartItems: products,
+        totalPrice: totalPrice,
+        isAuthenticated: req.session.isLogged,
+        sessionId: session.id,
+      })
+    })
+}
+
+exports.getCheckoutSuccess = (req, res, next) => {
+  req.user
+    .addOrder()
+    .then(() => {
+      res.redirect('/orders')
+    })
+    .catch((err) => {
+      console.log('__error_creating_order__', err)
+    })
+}
+
+exports.getCheckoutCancel = (req, res, next) => {
+  res.redirect('/cart')
 }

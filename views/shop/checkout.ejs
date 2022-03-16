@@ -1,0 +1,71 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/product.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+
+            <main>
+                <% if (cartItems.length > 0) { %>
+                    <div class="total_price__bar">
+                        <p>TotalPrice: <%= totalPrice %></p>
+                    </div>
+                    <hr>
+                    <div class="grid">
+                        <% for (let element of cartItems) { %>
+                            <article class="card product-item">
+                                <header class="card__header">
+                                    <h1 class="product__title">
+                                        <%= element.details.title %>
+                                    </h1>
+                                </header>
+                                <div class="card__image">
+                                    <img src="/<%= element.details.imageUrl %>" alt="<%= element.details.title %>">
+                                </div>
+                                <div class="card__content">
+                                    <h2 class="product__price">
+                                        ₹<%= element.details.price %>
+                                    </h2>
+                                    <p class="product__description">
+                                        <%= element.details.description %>
+                                    </p>
+                                    <h2 class="product__price">
+                                        Qty: <%= element.quantity %>
+                                    </h2>
+                                    
+                                </div>
+                                <div class="card__actions">
+                                    <form action="/delete-from-cart" method="POST">
+                                        <input type="hidden" name="productId" value="<%= element.productId %>">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button class="btn" type="submit">Delete</button>
+                                    </form>
+                                </div>
+                            </article>
+                            <% } %>
+                        </div>
+                        <hr>
+                        <!-- <div class="centered">
+                            <form action="/create-order" method="POST">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button class="btn" type="submit">Order Now</button>
+                            </form>
+                        </div> -->
+                        <div class="centered">
+                          <button id="order-btn" class="btn">Order</button>
+                          <script src="https://js.stripe.com/v3/"></script>
+                          <script>
+                            var stripe = Stripe('pk_test_51KduBoSBVfLszPhhPGr2bb8AsCGB2YCp4zIE1L0HAoZr5NtDN4CrIcZIgbuCmu9MCYF8UHuvjmwkKDGrl0dh4teL00kKXQaeLk')
+                            document.getElementById('order-btn').addEventListener('click', () => {
+                              stripe.redirectToCheckout({
+                                sessionId: '<%= sessionId %>'
+                              })
+                            })
+                          </script>
+                        </div>
+                <% } else { %>
+                    <h1>Cart is Empty!</h1>
+                <% } %>
+                
+            </main>
+            <%- include('../includes/end.ejs') %>
