@@ -1,5 +1,6 @@
 // core-modules
 const path = require('path')
+const fs = require('fs')
 
 // third-party-imports
 const express = require('express')
@@ -12,10 +13,12 @@ const csrf = require('csurf')
 const multer = require('multer')
 const helmet = require('helmet')
 const compression = require('compression')
+const morgan = require('morgan')
 
 // file-imports
 const errorController = require('./controllers/error')
 const User = require('./models/user')
+const { ROOT_PATH } = require('./util/file')
 
 // constants
 const MONGODB_URI = process.env.MONGODB_URI_SERVER
@@ -45,6 +48,10 @@ const fileFilter = (req, file, cb) => {
     cb(null, false)
   }
 }
+const accessLogStream = fs.createWriteStream(
+  path.join(ROOT_PATH, 'access.log'),
+  { flags: 'a' }
+)
 
 // set view-engine
 app.set('view engine', 'ejs')
@@ -59,6 +66,11 @@ const authRoutes = require('./routes/auth')
 app.use(helmet())
 // using compression
 app.use(compression())
+app.use(
+  morgan('combined', {
+    stream: accessLogStream,
+  })
+)
 
 // middlewares
 app.use(bodyParser.urlencoded({ extended: false }))
