@@ -10,6 +10,8 @@ const flash = require('connect-flash')
 const MongoDbStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
 const multer = require('multer')
+const helmet = require('helmet')
+
 // file-imports
 const errorController = require('./controllers/error')
 const User = require('./models/user')
@@ -51,6 +53,9 @@ app.set('views', 'views')
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 const authRoutes = require('./routes/auth')
+
+// securing headers
+app.use(helmet())
 
 // middlewares
 app.use(bodyParser.urlencoded({ extended: false }))
