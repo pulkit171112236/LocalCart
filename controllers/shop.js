@@ -1,8 +1,5 @@
 const path = require('path')
-
-const stripe = require('stripe')(
-  'sk_test_51KduBoSBVfLszPhhacLZj9n8ITZ3kk4ElKEQtgEDrIqmuCU0zGcg8xFyj29VtUuGLasmvxh5XSihKZQmV6ituKR100dk5T1wz6'
-)
+const stripe = require('stripe')(process.env.STRIPE_KEY)
 
 const Product = require('../models/product')
 const Order = require('../models/order')
