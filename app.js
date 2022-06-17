@@ -11,6 +11,7 @@ const MongoDbStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
 const multer = require('multer')
 const helmet = require('helmet')
+const compression = require('compression')
 
 // file-imports
 const errorController = require('./controllers/error')
@@ -56,6 +57,8 @@ const authRoutes = require('./routes/auth')
 
 // securing headers
 app.use(helmet())
+// using compression
+app.use(compression())
 
 // middlewares
 app.use(bodyParser.urlencoded({ extended: false }))
