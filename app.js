@@ -1,6 +1,7 @@
 // core-modules
 const path = require('path')
 const fs = require('fs')
+const https = require('https')
 
 // third-party-imports
 const express = require('express')
@@ -52,6 +53,8 @@ const accessLogStream = fs.createWriteStream(
   path.join(ROOT_PATH, 'access.log'),
   { flags: 'a' }
 )
+const privateKey = fs.readFileSync('server.key')
+const certificate = fs.readFileSync('server.cert')
 
 // set view-engine
 app.set('view engine', 'ejs')
@@ -120,7 +123,7 @@ mongoose
   .connect(MONGODB_URI)
   .then((result) => {
     console.log('Connected!')
-    app.listen(PORT)
+    https.createServer({ key: privateKey, cert: certificate }, app).listen(PORT)
   })
   .catch((err) => {
     console.log('client_not_connected', err)
