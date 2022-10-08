@@ -29,6 +29,12 @@
         <ul class="main-header__item-list">
             <% if (!locals.isAuthenticated || !isAuthenticated) { %>
                 <li class="main-header__item">
+                    <form action="/login/guest" method="post">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit">Guest</button>
+                    </form>
+                </li>
+                <li class="main-header__item">
                     <a class="<%= path === '/login' ? 'active' : '' %>" href="/login">Login</a>
                 </li>
                 <li class="main-header__item">
@@ -45,7 +51,7 @@
         </ul>
     </nav>
 </header>
-
+<!-- 
 <nav class="mobile-nav">
     <ul class="mobile-nav__item-list">
         <li class="mobile-nav__item">
@@ -72,6 +78,12 @@
         <% } %>
         <% if (!locals.isAuthenticated || !isAuthenticated) { %>
             <li class="mobile-nav__item">
+                <form action="/login/guest" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit">Guest</button>
+                </form>
+            </li>
+            <li class="mobile-nav__item">
                 <a class="<%= path === '/login' ? 'active' : '' %>" href="/login">Login</a>
             </li>
             <li class="mobile-nav__item">
@@ -86,4 +98,4 @@
             </li>
         <% } %>
     </ul>
-</nav>
+</nav> -->

@@ -78,7 +78,7 @@ form {
   color: #ffeb3b;
 }
 
-.mobile-nav {
+/* .mobile-nav {
   width: 30rem;
   height: 100vh;
   max-width: 90%;
@@ -129,7 +129,7 @@ form {
   background: #00695c;
   color: white;
   border-radius: 3px;
-}
+} */
 
 #side-menu-toggle {
   border: 1px solid white;

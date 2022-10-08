@@ -12,6 +12,15 @@ const transporter = nodemailer.createTransport(
   })
 )
 
+const GUEST_USER = {
+  name: 'guest',
+  email: 'guest171112236@localkart',
+  password: '$2a$12$2OOvfN63KHwFeNGFaN/VSuJHPLP.MsgNPNKJ16WxtC25R87hv8bzK',
+  cart: {
+    items: [],
+  },
+}
+
 exports.getLogin = (req, res, next) => {
   let errorMsg = req.flash('error')
   if (errorMsg.length > 0) {
@@ -54,6 +63,35 @@ exports.postLogin = (req, res, next) => {
     })
     .catch((err) => {
       console.log('__error_while_login__', err)
+    })
+}
+
+exports.postGuestLogin = (req, res, next) => {
+  // validate the admin username and password and attach to session
+  User.findOne({ email: 'guest171112236@localkart' })
+    .then((guest) => {
+      if (guest) {
+        return guest
+      } else {
+        guest = new User({ ...GUEST_USER })
+        return guest.save()
+      }
+    })
+    .then((guest) => {
+      // attach the guest to the session
+      req.session.user = { _id: guest._id }
+      req.session.isLogged = true
+      return req.session.save((err) => {
+        if (err) {
+          throw err
+        } else {
+          return res.redirect('/')
+        }
+      })
+    })
+    .catch((err) => {
+      console.log('__error_while_login__', err)
+      res.status(500).json({ error: 'INTERNAL SERVER ERRROR' })
     })
 }
 

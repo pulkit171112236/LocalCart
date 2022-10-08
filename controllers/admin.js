@@ -146,14 +146,19 @@ exports.deleteProduct = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.find().then((products) => {
-    res.render('admin/products', {
-      prods: products,
-      pageTitle: 'Admin Products',
-      path: '/admin/products',
-      isAuthenticated: req.session.isLogged,
+  Product.find({ userId: req.session.user._id })
+    .then((products) => {
+      res.render('admin/products', {
+        prods: products,
+        pageTitle: 'Admin Products',
+        path: '/admin/products',
+        isAuthenticated: req.session.isLogged,
+      })
     })
-  })
+    .catch((err) => {
+      console.log('Error while getting products\n', err)
+      res.status(500).send('<center>500 Internal Server Error</center>')
+    })
 }
 
 exports.getInvoice = (req, res, next) => {
