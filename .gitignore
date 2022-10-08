@@ -118,5 +118,5 @@ dist
 .pnp.*
 
 # static files
-images
+static/
 data

@@ -8,7 +8,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const session = require('express-session')
 const flash = require('connect-flash')
-const MongoDbStore = require('connect-mongodb-session')(session)
+const MongoDBStore = require('connect-mongodb-session')(session)
 const csrf = require('csurf')
 const multer = require('multer')
 const helmet = require('helmet')
@@ -18,15 +18,12 @@ const morgan = require('morgan')
 // file-imports
 const errorController = require('./controllers/error')
 const User = require('./models/user')
-const { ROOT_PATH } = require('./util/file')
-
-// constants
-const MONGODB_URI = process.env.MONGODB_URI_SERVER
+const { ROOT_PATH, writeToLocal } = require('./util/file')
 
 // required objects
 const app = express()
-const mongodbStore = MongoDbStore({
-  uri: MONGODB_URI,
+const mongodbStore = MongoDBStore({
+  uri: process.env.MONGODB_URI,
   collection: 'sessions',
 })
 const uploadedFileStorage = multer.diskStorage({
@@ -34,7 +31,8 @@ const uploadedFileStorage = multer.diskStorage({
     cb(null, new Date().getTime() + '-' + file.originalname)
   },
   destination: (req, file, cb) => {
-    cb(null, 'images')
+    fs.mkdirSync('static/product_image', { recursive: true })
+    cb(null, 'static/product_image')
   },
 })
 const fileFilter = (req, file, cb) => {
@@ -61,9 +59,19 @@ app.set('views', 'views')
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 const authRoutes = require('./routes/auth')
+const b2 = require('./util/b2')
 
 // securing headers
-app.use(helmet())
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'script-src-attr': ["'unsafe-inline'"],
+      },
+    },
+  })
+)
 // using compression
 app.use(compression())
 app.use(
@@ -80,7 +88,29 @@ app.use(
   )
 )
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/images', express.static(path.join(__dirname, 'images')))
+app.use(
+  '/static',
+  express.static(path.join(__dirname, 'static')),
+  (req, res, next) => {
+    console.log('original-url:', req.originalUrl)
+    const fileKey = req.originalUrl.startsWith('/')
+      ? req.originalUrl.slice(1)
+      : req.originalUrl
+    b2.fetchFileBuffer(fileKey).then((buffer) => {
+      if (buffer) {
+        writeToLocal(fileKey, buffer).then((err) => {
+          console.log('fs-err:', err)
+          if (err) {
+            res.status(500).json({ error: '500 INTERNAL SERVER ERROR' })
+          }
+          res.send(buffer)
+        })
+      } else {
+        res.status(404).json({ error: 'Image Not found on server' })
+      }
+    })
+  }
+)
 app.use(
   session({
     secret: 'a long string as secret',
@@ -117,7 +147,7 @@ app.use(errorController.get404)
 
 const PORT = process.env.PORT || 3000
 mongoose
-  .connect(MONGODB_URI)
+  .connect(process.env.MONGODB_URI)
   .then((result) => {
     console.log('Connected!')
     app.listen(PORT)

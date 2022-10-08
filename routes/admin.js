@@ -19,10 +19,10 @@ router.get('/edit-product/:productId', isAuth, adminController.getEditProduct)
 // /admin/edit-product => POST
 router.post('/edit-product', isAuth, adminController.postEditProduct)
 
-// router.post('/delete-product', isAuth, adminController.postDeleteProduct)
-
+// /admin/product/<productId> => DELETE
 router.delete('/product/:productId', isAuth, adminController.deleteProduct)
 
+// /admin/invoice/<orderId> => GET
 router.get('/invoice/:orderId', isAuth, adminController.getInvoice)
 
 module.exports = router

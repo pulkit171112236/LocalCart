@@ -7,6 +7,9 @@ const Product = require('../models/product')
 const Order = require('../models/order')
 
 const fileUtils = require('../util/file')
+const b2 = require('../util/b2')
+
+const DEAFULT_PRODUCT_IMAGE_PATH = 'images/default_product_image.png'
 
 exports.getAddProduct = (req, res, next) => {
   let errorMsg = req.flash('error')
@@ -33,13 +36,20 @@ exports.postAddProduct = (req, res, next) => {
   const product = new Product({
     title,
     price,
-    imageUrl: image.path,
     description,
     userId: req.user._id,
   })
-  product
-    .save()
-    .then(() => {
+  b2.uploadFile(image.path, image.path)
+    .then((result) => {
+      if (result) {
+        product.imageUrl = image.path
+      } else {
+        product.imageUrl = DEAFULT_PRODUCT_IMAGE_PATH
+      }
+      return product.save()
+    })
+    .then((product) => {
+      console.log('product:', product)
       res.redirect('/products')
     })
     .catch((err) => {
@@ -81,15 +91,30 @@ exports.postEditProduct = (req, res, next) => {
         return res.redirect('/')
       }
       product.title = updatedTitle
-      if (updatedImage) {
-        fileUtils.deleteFile(product.imageUrl)
-        product.imageUrl = updatedImage.path
-      }
       product.price = updatedPrice
       product.description = updatedDesc
-      product.save().then(() => {
-        res.redirect('/admin/products')
-      })
+      // if new image is uploaded by user then use that image else don't update image field
+      if (updatedImage) {
+        fileUtils.deleteFile(product.imageUrl)
+        b2.deleteFile(product.imageUrl)
+        // upload the new image to b2 and save the image field incase new image is not uploaded use default image for product
+        return b2
+          .uploadFile(updatedImage.path, updatedImage.path)
+          .then((result) => {
+            if (result) {
+              product.imageUrl = result.Key
+            } else {
+              console.log('File not uploaded to B2 storage!')
+              product.imageUrl = DEAFULT_PRODUCT_IMAGE_PATH
+            }
+            return product.save()
+          })
+      } else {
+        return product.save()
+      }
+    })
+    .then(() => {
+      res.redirect('/admin/products')
     })
     .catch((err) => {
       console.log('__error_while_editing_')
@@ -97,24 +122,20 @@ exports.postEditProduct = (req, res, next) => {
     })
 }
 
-exports.postDeleteProduct = (req, res, next) => {
-  const productId = req.body.productId
-  Product.findById(productId)
-    .then((product) => {
-      fileUtils.deleteFile(product.imageUrl)
-      return Product.deleteOne({ _id: productId, userId: req.user._id })
-    })
-    .then(() => {
-      res.redirect('/admin/products')
-    })
-}
-
 exports.deleteProduct = (req, res, next) => {
   const productId = req.params.productId
   Product.findById(productId)
     .then((product) => {
-      fileUtils.deleteFile(product.imageUrl)
-      return Product.deleteOne({ _id: productId, userId: req.user._id })
+      // check if product is created by the current user
+      if (product.userId.toString() === req.user._id.toString()) {
+        // delete file on local and B2 asynchronously and log error if occured
+        fileUtils.deleteFile(product.imageUrl)
+        b2.deleteFile(product.imageUrl)
+        // delete the product from database in parallel
+        return Product.deleteOne({ _id: productId, userId: req.user._id })
+      } else {
+        return res.status(401).json({ message: 'Not Authorized' })
+      }
     })
     .then(() => {
       res.status(200).json({ message: 'SUCCESS' })
